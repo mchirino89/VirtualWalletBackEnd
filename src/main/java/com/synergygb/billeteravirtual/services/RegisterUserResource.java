@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
  *
  * @author mauriciochirino
  */
+
 @Path("user")
 public class RegisterUserResource {
     
