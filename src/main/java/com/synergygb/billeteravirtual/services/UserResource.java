@@ -6,6 +6,7 @@
 
 package com.synergygb.billeteravirtual.services;
 
+import java.net.HttpURLConnection;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -18,13 +19,13 @@ import javax.ws.rs.core.Response;
  */
 
 @Path("user")
-public class RegisterUserResource {
+public class UserResource {
     
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registrarUsuario(User registrado) {
         
-        return Response.status(200).entity(registrado.toString()).build();
+        return Response.status(HttpURLConnection.HTTP_OK).entity(registrado.toString()).build();
     }
-    //
+    //HttpURLConnection.HTTP_OK
 }
