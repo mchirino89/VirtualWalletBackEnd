@@ -16,15 +16,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.9</version>
+            <groupId>com.synergygb.asegura</groupId>
+            <artifactId>core</artifactId>
+            <version>0.1.1</version>
+            <type>jar</type>
         </dependency>
         <dependency>
-		<groupId>com.sun.jersey</groupId>
-		<artifactId>jersey-json</artifactId>
-		<version>1.9</version>
-	</dependency>
+            <groupId>com.synergygb.asegura.rest</groupId>
+            <artifactId>notificacionlib</artifactId>
+            <version>0.4</version>
+            <type>jar</type>
+        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="windows-1252"?>
+
+<notificacion>
+    <!-- COUCHBASE PARAMETERS -->
+    <Couchbase>
+        <moduleCouchbaseURL>http://localhost:8091/pools</moduleCouchbaseURL>
+        <maxWaitMillis>30000</maxWaitMillis>
+        <minIdle>0</minIdle>
+        <timeBetweenEvictions>620000</timeBetweenEvictions>
+        <minIdleEvictionTime>600000</minIdleEvictionTime>
+        <sessionTimeOut>120000</sessionTimeOut>
+    </Couchbase>
+    <!-- MODULE CACHE PARAMETERS -->
+    <moduleCache>
+        <bucketName>transaccional</bucketName>
+        <bucketPassword>synergy</bucketPassword>
+        <poolSize>200</poolSize>
+        <objectsSecs>3600</objectsSecs>
+    </moduleCache>    
+    <!-- MODULE STATS PARAMETERS -->
+    <moduleStats>
+        <bucketName>default</bucketName>
+        <bucketPassword></bucketPassword>
+        <poolSize>200</poolSize>
+        <objectsSecs>3600</objectsSecs>
+    </moduleStats>   
+    <!-- REOMTE COMMUNICATION -->
+    <!--    <dummiesEndPoint>C:/Users/John Crespo/Documents/NetBeansProjects/AseguraPlus/Notificacion/src/main/resources/META-INF</dummiesEndPoint>-->
+    <dummiesEndPoint>/home/synergy/settingsAsegura/notificacion/dummies</dummiesEndPoint>
+    
+    <!--    BRANCH TIMEOUT  -->
+    <branchSecs>86400</branchSecs>
+    <!-- MOBILE PROPERTIES -->
+    <mobileProperties>
+        
+        <currentIOSPhoneVersion>20120813</currentIOSPhoneVersion>
+        <iosUpdateId>iosphone000</iosUpdateId>
+        
+        <obligatoryUpdate>true</obligatoryUpdate>
+        <webDownload>http://www.synergy-gb.com</webDownload>
+        
+    </mobileProperties>
+    <!--DB PROPERTIES-->
+    <db>
+        <host></host>
+        <port></port>
+        <name></name>
+        <user></user>
+        <password></password>
+        <driver></driver>
+    </db>    
+</notificacion>
