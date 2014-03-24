@@ -1,7 +1,7 @@
 package com.synergygb.billeteravirtual.services;
 
-import com.synergygb.asegura.core.services.utils.ServiceUtils;
-import com.synergygb.billeteravirtual.handlers.LoginPOSTHandler;
+import com.synergygb.billeteravirtual.core.ServiceUtils;
+import com.synergygb.billeteravirtual.handlers.sessionPOSTHandler;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
 import com.synergygb.webAPI.handlers.WebServiceStatus;
 import com.synergygb.webAPI.handlers.WebServiceStatusType;
@@ -19,8 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-//import com.synergygb.asegura.core;
-
 /**
  *
  * @author mauriciochirino
@@ -28,14 +26,9 @@ import javax.ws.rs.core.UriInfo;
 @Path("/session")
 public class SessionResource {
 
-    @Context
-    private UriInfo context;
-    @Context
-    UriInfo uriInfo;
-    @Context
-    Request request;
-    @Context
-    HttpHeaders headers;
+    @Context UriInfo uriInfo;
+    @Context Request request;
+    @Context HttpHeaders headers;
     String id;
 
     public SessionResource(UriInfo uriInfo, Request request, String id, HttpHeaders headers) {
@@ -43,7 +36,6 @@ public class SessionResource {
         this.request = request;
         this.headers = headers;
         this.id = id;
-        //System.out.println("request: "+request.toString());
     }
 
     @POST
@@ -70,7 +62,7 @@ public class SessionResource {
         //---------------------------------------------------------------------
         // Calling login handler
         //---------------------------------------------------------------------
-        LoginPOSTHandler handler = new LoginPOSTHandler();
+        sessionPOSTHandler handler = new sessionPOSTHandler();
         try {
             status = handler.run(webRequest, webResponse);
         }
