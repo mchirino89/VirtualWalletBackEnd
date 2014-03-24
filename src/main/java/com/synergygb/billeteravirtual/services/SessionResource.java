@@ -42,7 +42,7 @@ public class SessionResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response registrarUsuario(String content) {
-
+        
         WebServiceStatus status = null;
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
 
@@ -84,7 +84,7 @@ public class SessionResource {
         } else {
             return WebServiceHandler.okResponseFromStatus(status, mediaType);
         }
-
+        
         //return Response.status(Response.Status.CREATED).build();
     }
 }

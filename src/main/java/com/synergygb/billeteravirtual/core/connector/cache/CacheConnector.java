@@ -1,6 +1,6 @@
 package com.synergygb.billeteravirtual.core.connector.cache;
 
-import com.synergygb.asegura.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import java.util.List;
 
 /**

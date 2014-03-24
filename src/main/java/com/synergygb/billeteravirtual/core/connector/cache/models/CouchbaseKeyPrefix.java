@@ -1,6 +1,6 @@
 package com.synergygb.billeteravirtual.core.connector.cache.models;
 
-import com.synergygb.asegura.core.config.AppXMLConfiguration;
+import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 
 /**
  * BancaPlus REST Web Services

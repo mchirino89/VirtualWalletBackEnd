@@ -18,7 +18,7 @@
  */
 package com.synergygb.billeteravirtual.core.config;
 
-import com.synergygb.asegura.core.config.exceptions.InvalidAppIdException;
+import com.synergygb.billeteravirtual.core.config.exceptions.InvalidAppIdException;
 
 public enum ApplicationId {
     

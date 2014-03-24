@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.synergygb.billeteravirtual.services;
+package com.synergygb.billeteravirtual.notificacion.models;
 
 import java.io.Serializable;
 

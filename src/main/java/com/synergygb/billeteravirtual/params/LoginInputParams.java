@@ -41,6 +41,11 @@ public class LoginInputParams {
     public static final String BRANCHES_VERSION = "branchesVersion";
     */
     
+    /**
+     public static final String[] MANDATORY_LOGIN_FIELDS = {CI_PARAM, PASS_PARAM, APP_PARAM, TYPE_PARAM, BRANCHES_VERSION};
+    public static final String[] MANDATORY_STATEMENT_FIELDS = {CI_PARAM,PASS_PARAM,TYPE_PARAM};
+     */
+    
     public static final String[] MANDATORY_LOGIN_FIELDS = {CI_PARAM, PASS_PARAM};
     public static final String[] MANDATORY_STATEMENT_FIELDS = {CI_PARAM,PASS_PARAM};
     

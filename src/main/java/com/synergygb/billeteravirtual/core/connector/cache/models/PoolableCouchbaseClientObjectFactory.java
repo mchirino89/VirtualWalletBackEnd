@@ -4,7 +4,7 @@ package com.synergygb.billeteravirtual.core.connector.cache.models;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
-import com.synergygb.asegura.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.logformatter.LogUtils;
 import com.synergygb.logformatter.WSLog;

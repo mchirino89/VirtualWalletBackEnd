@@ -19,7 +19,7 @@
 package com.synergygb.billeteravirtual.core.connector.cache;
 
 import com.couchbase.client.CouchbaseClient;
-import com.synergygb.asegura.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import java.util.List;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
