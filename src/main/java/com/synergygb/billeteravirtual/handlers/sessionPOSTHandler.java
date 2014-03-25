@@ -20,7 +20,7 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
-import com.synergygb.billeteravirtual.notificacion.models.Session;
+import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
@@ -41,7 +41,7 @@ import org.apache.log4j.PatternLayout;
 
 /**
  *
- * @author mauriciochirino
+ *  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  */
 public class sessionPOSTHandler extends WebServiceHandler {
 
@@ -61,7 +61,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         String cookie = null;
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType;
-        Session loginModel = null;
+        LoginParamsModel loginModel = null;
         long totalServiceTime = new Date().getTime();
         //-----------------------------------------------------
         // Declaring connector variables
@@ -75,10 +75,9 @@ public class sessionPOSTHandler extends WebServiceHandler {
         LayerDataObject loginLdo = null;
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
-            loginModel = (Session) loginLdo.toObject(Session.class);
-            //ParamsValidator.validateLogin(loginModel.getCi(), loginModel.getPass(), loginModel.getApp().getPlatform(), loginModel.getType());
+            loginModel = (LoginParamsModel) loginLdo.toObject(LoginParamsModel.class);
         } catch (LayerDataObjectToObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, com.synergygb.asegura.core.models.config.ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
         }
         //---------------------------------------------------------------------
@@ -98,7 +97,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo crear el cache connector"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.DB_ACCESS_ERROR);
         }
-        
+
         //--------------------------------------------------------
         // Establishing Communication with remote layer for login
         //--------------------------------------------------------
@@ -110,19 +109,19 @@ public class sessionPOSTHandler extends WebServiceHandler {
             responseLogin = Communication.postLoginData(communicationType, loginModel);
             commOk = true;
         } catch (AuthenticationException ex) {
-            logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, com.synergygb.asegura.core.models.config.ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
+            logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.AUTHENTICATION_ERROR);
         } catch (BackendException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, com.synergygb.asegura.core.models.config.ErrorID.LAYER_COMMUNICATION.getId(), "Error de backend "), ex);
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LAYER_COMMUNICATION.getId(), "Error de backend "), ex);
             return WebServiceStatus.buildStatus(new BackendErrorStatus(BackendErrorStatus.STATUS_CODE + "_" + ex.getMessage()));
         } catch (LayerCommunicationException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, com.synergygb.asegura.core.models.config.ErrorID.LAYER_COMMUNICATION.getId(), "Error de comunicacion. "), ex);
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LAYER_COMMUNICATION.getId(), "Error de comunicacion. "), ex);
             return WebServiceStatus.buildStatus(ex);
         } catch (LayerDataObjectToObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, com.synergygb.asegura.core.models.config.ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         } catch (LayerDataObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, com.synergygb.asegura.core.models.config.ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         } finally {
             if (!commOk) {

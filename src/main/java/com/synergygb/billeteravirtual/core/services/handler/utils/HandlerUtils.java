@@ -7,7 +7,7 @@ import com.synergygb.webAPI.parameters.WebServiceParameters;
 import com.synergygb.webAPI.parameters.exceptions.MissingParameterException;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  *
  * @author Synergy-GB
  * @author John Crespo <john.crespo@synergy-gb.com>

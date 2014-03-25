@@ -18,12 +18,11 @@
  */
 package com.synergygb.billeteravirtual.notificacion.models.cache;
 
-import com.synergygb.asegura.notificacion.models.Application;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  * @author Synergy-GB
  * @author John Crespo John Crespo <john.crespo@synergy-gb.com>
  * @version 1.0
@@ -59,11 +58,6 @@ public class TransactionStat implements Serializable {
      */
     private Operation operation;
     /**
-     * Application that executed the transaction
-     */
-    Application application;
-    
-    /**
      * Transaction final status
      */
     String status;
@@ -94,14 +88,6 @@ public class TransactionStat implements Serializable {
 
     public void setTransactionStatId(String transactionStatId) {
         this.transactionStatId = transactionStatId;
-    }
-    
-    public Application getApplication() {
-        return application;
-    }
-
-    public void setApplication(Application application) {
-        this.application = application;
     }
 
     public String getCookieId() {

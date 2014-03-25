@@ -21,7 +21,7 @@ package com.synergygb.billeteravirtual.notificacion.services.models;
 import java.io.Serializable;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  *
  * @author Synergy-GB
  * @author John Crespo John Crespo <john.crespo@synergy-gb.com>
@@ -31,10 +31,9 @@ public class LoginParamsModel implements Serializable {
     public LoginParamsModel() {
     }
 
-    public LoginParamsModel(String ci, String pass, ApplicationParamsModel app) {
+    public LoginParamsModel(String ci, String pass) {
         this.ci = ci;
         this.pass = pass;
-        this.app = app;
     }
     /**
      * Document number
@@ -45,18 +44,14 @@ public class LoginParamsModel implements Serializable {
      */
     private String pass;
     /**
-     * Application model
+     * @return the pass
      */
-    private ApplicationParamsModel app;
-
-    public void setApp(ApplicationParamsModel app) {
-        this.app = app;
-    }
-
     public String getPass() {
         return pass;
     }
-
+    /**
+     * @param pass the pass to set
+     */
     public void setPass(String pass) {
         this.pass = pass;
     }
@@ -66,7 +61,6 @@ public class LoginParamsModel implements Serializable {
     public String getCi() {
         return ci;
     }
-
     /**
      * @param ci the ci to set
      */

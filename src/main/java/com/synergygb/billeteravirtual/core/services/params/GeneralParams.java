@@ -19,7 +19,7 @@
 package com.synergygb.billeteravirtual.core.services.params;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  *
  * @author Synergy-GB
  * @author John Crespo <john.crespo@synergy-gb.com>

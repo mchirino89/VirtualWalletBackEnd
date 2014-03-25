@@ -21,7 +21,6 @@ package com.synergygb.billeteravirtual.notificacion.handlers.threads;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.connector.cache.models.CouchbaseKeyPrefix;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
-import com.synergygb.billeteravirtual.notificacion.models.Application;
 import com.synergygb.billeteravirtual.notificacion.models.cache.Operation;
 import com.synergygb.billeteravirtual.notificacion.models.cache.TransactionStat;
 import com.synergygb.billeteravirtual.notificacion.models.utils.OperationType;
@@ -34,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  * @author Synergy-GB
  * @author John Crespo John Crespo <john.crespo@synergy-gb.com>
  * @version 1.0

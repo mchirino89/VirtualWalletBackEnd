@@ -15,20 +15,19 @@
  */
 package com.synergygb.billeteravirtual.notificacion.models.cache;
 
-import com.synergygb.billeteravirtual.notificacion.models.Application;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  *
  * @author Synergy-GB
  * @author John Crespo <john.crespo@synergy-gb.com>
  * @version 1.0
  */
+@XmlRootElement
 public class UserSession implements Serializable {
 
     /**
@@ -43,10 +42,6 @@ public class UserSession implements Serializable {
      * User password
      */
     String password;
-    /**
-     * User Application information
-     */
-    Application application;
     /**
      * Session start time
      */
@@ -87,14 +82,6 @@ public class UserSession implements Serializable {
         this.password = password;
     }
 
-    public Application getApplication() {
-        return application;
-    }
-
-    public void setApplication(Application application) {
-        this.application = application;
-    }
-
     public String getSessionStart() {
         return sessionStart;
     }
@@ -105,6 +92,6 @@ public class UserSession implements Serializable {
 
     @Override
     public String toString() {
-        return "UserSession{" + "lastUpdate=" + lastUpdate + ", password=" + password + ", loginCi=" + loginCi + ", application=" + application + '}';
+        return "UserSession{" + "lastUpdate=" + lastUpdate + ", password=" + password + ", loginCi=" + loginCi + '}';
     }
 }

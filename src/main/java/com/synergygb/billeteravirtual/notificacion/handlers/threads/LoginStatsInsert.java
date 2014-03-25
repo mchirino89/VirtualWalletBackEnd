@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  * @author Synergy-GB
  * @author John Crespo John Crespo <john.crespo@synergy-gb.com>
  */

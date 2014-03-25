@@ -21,7 +21,7 @@ package com.synergygb.billeteravirtual.notificacion.services.utils;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  * 
  * Class defining a static Thread Pool for handling non-mandatory session data insertion
  * 

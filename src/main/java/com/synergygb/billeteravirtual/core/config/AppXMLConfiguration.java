@@ -22,16 +22,17 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
 /**
- * Asegura+ REST Web Services
- *
+ * Billetera Virtual+ REST Web Services
  * @author Synergy-GB
  * @author John Crespo <john.crespo@synergy-gb.com>
+ * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  * @version 1.0
  */
 public class AppXMLConfiguration {
 
     private static final String CONFIG_FILE_NAME = "META-INF/config.xml";
-    public static final String COUCHBASE_PREFIX = "asegura-";
+    //public static final String COUCHBASE_PREFIX = "asegura-";
+    public static final String COUCHBASE_PREFIX = "billeteravirtual-";
     public static String TERMS_VERSION = "Y";
     public static final XMLConfiguration CONFIG;
     // Config XML file node label variables

@@ -16,31 +16,25 @@
  * http://www.synergy-gb.com/licenciamiento.pdf
  * 
  */
-package com.synergygb.billeteravirtual.core.config.exceptions;
+package com.synergygb.billeteravirtual.notificacion.communication.exceptions;
 
-import com.synergygb.webAPI.handlers.WebServiceCustomStatus;
+import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationException;
 /**
- * Billetera Virtual+ REST Web Services
+ * Nuevo Mundo Mobile Car Insurance REST Web Services
  * @author Synergy-GB
- * @author John Crespo John Crespo <john.crespo@synergy-gb.com>, Juan Garcia<juan.garcia@synergy-gb.com>
+ * @author John Crespo <john.crespo@synergy-gb.com>
  * @version 1.0
  */
-public class BackendErrorStatus extends WebServiceCustomStatus{
-
-    public static String STATUS_CODE = "BACKEND_ERROR";
-    public static String STATUS_MESSAGE = "La operación no puede ser procesada, por favor intente más tarde.";
-    public static String DEFAULT_ERROR = "Falló la operación";
-
-    public BackendErrorStatus() {
-        super(STATUS_CODE, STATUS_MESSAGE);
+public class PreexistingUserException extends LayerCommunicationException {
+    
+    public static final String STATUS_CODE = "PREEXISTING_USER";
+    
+    public static final String STATUS_MSG = "Usuario previamente registrado.";
+    
+    public PreexistingUserException(){
     }
-
-    public BackendErrorStatus(String statusCode) {
-        super(statusCode, STATUS_MESSAGE);
+    
+    public PreexistingUserException(String msg) {
+        super(msg);
     }
-
-    public BackendErrorStatus(String statusCode, String statusMessage) {
-        super(statusCode, statusMessage);
-    }
-
 }

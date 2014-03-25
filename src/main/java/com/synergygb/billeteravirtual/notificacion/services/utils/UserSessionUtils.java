@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 /**
- * Asegura+ REST Web Services
+ * Billetera Virtual+ REST Web Services
  * @author Synergy-GB
  * @author John Crespo John Crespo <john.crespo@synergy-gb.com>
  * @version 1.0

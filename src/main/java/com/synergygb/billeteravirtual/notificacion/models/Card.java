@@ -6,11 +6,13 @@
 package com.synergygb.billeteravirtual.notificacion.models;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author mauriciochirino
  */
+@XmlRootElement
 public class Card implements Serializable {
 
     private int ultDigito;
