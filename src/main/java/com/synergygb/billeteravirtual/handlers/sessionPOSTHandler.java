@@ -64,9 +64,8 @@ public class sessionPOSTHandler extends WebServiceHandler {
         LoginParamsModel loginModel = null;
         long totalServiceTime = new Date().getTime();
         //-----------------------------------------------------
-        // Declaring connector variables
+        // Declaring connector 
         //-----------------------------------------------------
-        GenericMemcachedConnector statsConnector = null;
         GenericMemcachedConnector cacheConnector = null;
         //-----------------------------------------------------
         // Filtering communication type
@@ -81,14 +80,6 @@ public class sessionPOSTHandler extends WebServiceHandler {
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
         }
         //---------------------------------------------------------------------
-        // Initializing stats connector
-        //---------------------------------------------------------------------
-        try {
-            statsConnector = new GenericMemcachedConnector(AppXMLConfiguration.MODULE_STATS_OBJECTS_SECS, CouchbasePool.getPool(CacheBucketType.STATS_BUCKET));
-        } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo crear el cache connector"), ex);
-        }
-        //---------------------------------------------------------------------
         // Initializing cache connector
         //---------------------------------------------------------------------
         try {
@@ -97,7 +88,10 @@ public class sessionPOSTHandler extends WebServiceHandler {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo crear el cache connector"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.DB_ACCESS_ERROR);
         }
-
+        /* -- insercion de estadisticas!
+         LoginFailedStatsInsert loginFailedThread = new LoginFailedStatsInsert(cookie, loginModel, statsConnector);
+         SessionThreadPool.sessionThreadPoolExecutor.execute(loginFailedThread);
+         */
         //--------------------------------------------------------
         // Establishing Communication with remote layer for login
         //--------------------------------------------------------
@@ -106,7 +100,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         boolean commOk = false;
         try {
             cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
-            responseLogin = Communication.postLoginData(communicationType, loginModel);
+            responseLogin = Communication.postLoginData(communicationType, loginModel, cacheConnector);
             commOk = true;
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
@@ -123,14 +117,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         } catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
-        } finally {
-            if (!commOk) {
-                //insercion de estadisticas!
-                LoginFailedStatsInsert loginFailedThread = new LoginFailedStatsInsert(cookie, loginModel, statsConnector);
-                SessionThreadPool.sessionThreadPoolExecutor.execute(loginFailedThread);
-            }
-        }
+        } 
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
-
 }

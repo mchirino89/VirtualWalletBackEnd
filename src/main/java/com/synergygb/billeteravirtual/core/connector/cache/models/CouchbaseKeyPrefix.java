@@ -16,7 +16,7 @@ public class CouchbaseKeyPrefix {
 //    /**
 //     * Cache key associated to a user session
 //     */
-    public static String USER_SESSION_PREFIX = AppXMLConfiguration.COUCHBASE_PREFIX + "session-";
+    public static String USER_SESSION_PREFIX = AppXMLConfiguration.COUCHBASE_PREFIX + "billetera-";
 //    /**
 //     * Cache key associated to a user session
 //     */
@@ -104,7 +104,7 @@ public class CouchbaseKeyPrefix {
 //    /**
 //     * Cache key prefix for user transaction statistics
 //     */
-    public static String USER_TRANSACTION_STAT = AppXMLConfiguration.COUCHBASE_PREFIX + "transaction-";
+    public static String USER_TRANSACTION_STAT = AppXMLConfiguration.COUCHBASE_PREFIX + "transaccional-";
 //    /**
 //     * Cache key prefix for user contact info hash
 //     */
