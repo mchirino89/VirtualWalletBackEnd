@@ -25,10 +25,7 @@ import com.synergygb.billeteravirtual.core.connector.cache.models.CouchbaseKeyPr
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.models.cache.Operation;
-import com.synergygb.billeteravirtual.notificacion.models.cache.TransactionStat;
 import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
-import com.synergygb.billeteravirtual.notificacion.models.utils.OperationType;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
@@ -37,7 +34,6 @@ import com.synergygb.webAPI.layerCommunication.LayerDataObject;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
-import java.util.Date;
 import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -102,8 +98,8 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     private boolean initInput(LoginParamsModel loginModel) {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD" + loginModel.getCi() ));
         try {
-            String user = (String) cacheConnector.get(CouchbaseKeyPrefix.USER_PREFIX, loginModel.getCi());
-            if(user.equals("") || user == null){
+            String user = (String) cacheConnector.get("user-"+loginModel.getCi());
+            if(user.equals("{\"error\":\"not_found\",\"reason\":\"missing\"}") || user == null){
                 return false;
             }
         } catch (CouchbaseOperationException ex) {

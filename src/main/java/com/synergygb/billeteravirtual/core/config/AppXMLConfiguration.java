@@ -32,7 +32,7 @@ public class AppXMLConfiguration {
 
     private static final String CONFIG_FILE_NAME = "META-INF/config.xml";
     //public static final String COUCHBASE_PREFIX = "asegura-";
-    public static final String COUCHBASE_PREFIX = "billeteravirtual-";
+    public static final String COUCHBASE_PREFIX = "billetera-";
     public static String TERMS_VERSION = "Y";
     public static final XMLConfiguration CONFIG;
     // Config XML file node label variables

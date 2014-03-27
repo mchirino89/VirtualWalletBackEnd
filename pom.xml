@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.synergy</groupId>
-    <artifactId>BilleteraVirtual</artifactId>
+    <artifactId>asegura</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
-    <name>BilleteraVirtual</name>
+    <name>asegura</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -16,6 +16,7 @@
 
     <dependencies>
         <dependency>
+            <!-- ¿para qué es esto? -->
             <groupId>com.synergygb.asegura</groupId>
             <artifactId>core</artifactId>
             <version>0.1.1</version>
