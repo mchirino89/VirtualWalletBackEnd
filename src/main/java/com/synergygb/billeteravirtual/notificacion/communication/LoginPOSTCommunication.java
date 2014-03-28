@@ -99,6 +99,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD" + loginModel.getCi() ));
         try {
             String user = (String) cacheConnector.get("user-"+loginModel.getCi());
+            System.out.println("retornado: "+user);
             if(user.equals("{\"error\":\"not_found\",\"reason\":\"missing\"}") || user == null){
                 return false;
             }

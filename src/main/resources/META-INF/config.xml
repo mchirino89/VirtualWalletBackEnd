@@ -3,7 +3,7 @@
 <notificacion>
     <!-- COUCHBASE PARAMETERS -->
     <Couchbase>
-        <moduleCouchbaseURL>http://localhost:8091/pools</moduleCouchbaseURL>
+        <moduleCouchbaseURL>http://172.16.16.129:8091/pools</moduleCouchbaseURL>
         <maxWaitMillis>30000</maxWaitMillis>
         <minIdle>0</minIdle>
         <timeBetweenEvictions>620000</timeBetweenEvictions>
@@ -12,8 +12,8 @@
     </Couchbase>
     <!-- MODULE CACHE PARAMETERS -->
     <moduleCache>
-        <bucketName>transaccional</bucketName>
-        <bucketPassword>synergy</bucketPassword>
+        <bucketName>default</bucketName>
+        <bucketPassword></bucketPassword>
         <poolSize>200</poolSize>
         <objectsSecs>3600</objectsSecs>
     </moduleCache>    

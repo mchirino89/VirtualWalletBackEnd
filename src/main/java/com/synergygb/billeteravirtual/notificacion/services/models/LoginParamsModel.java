@@ -19,6 +19,7 @@
 package com.synergygb.billeteravirtual.notificacion.services.models;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -26,6 +27,7 @@ import java.io.Serializable;
  * @author Synergy-GB
  * @author John Crespo John Crespo <john.crespo@synergy-gb.com>
  */
+@XmlRootElement
 public class LoginParamsModel implements Serializable {
 
     public LoginParamsModel() {
