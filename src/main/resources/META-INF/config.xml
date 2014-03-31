@@ -12,7 +12,7 @@
     </Couchbase>
     <!-- MODULE CACHE PARAMETERS -->
     <moduleCache>
-        <bucketName>default</bucketName>
+        <bucketName>billetera</bucketName>
         <bucketPassword></bucketPassword>
         <poolSize>200</poolSize>
         <objectsSecs>3600</objectsSecs>
