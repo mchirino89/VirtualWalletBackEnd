@@ -10,8 +10,6 @@ import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.utils.CookieUtils;
 import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
-import com.synergygb.billeteravirtual.notificacion.handlers.threads.LoginFailedStatsInsert;
-import com.synergygb.billeteravirtual.notificacion.services.utils.SessionThreadPool;
 import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
@@ -21,6 +19,7 @@ import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
+import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
@@ -88,20 +87,14 @@ public class sessionPOSTHandler extends WebServiceHandler {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo crear el cache connector"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.DB_ACCESS_ERROR);
         }
-        /* -- insercion de estadisticas!
-         LoginFailedStatsInsert loginFailedThread = new LoginFailedStatsInsert(cookie, loginModel, statsConnector);
-         SessionThreadPool.sessionThreadPoolExecutor.execute(loginFailedThread);
-         */
         //--------------------------------------------------------
         // Establishing Communication with remote layer for login
         //--------------------------------------------------------
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         UserInfo responseLogin = null;
-        boolean commOk = false;
         try {
             cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
             responseLogin = Communication.postLoginData(communicationType, loginModel, cacheConnector);
-            commOk = true;
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.AUTHENTICATION_ERROR);
@@ -118,6 +111,8 @@ public class sessionPOSTHandler extends WebServiceHandler {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         } 
+        response.addProperty(GenericParams.USER_COOKIE, cookie);
+        //response.addParamFromLDO("objeto", responseLogin);
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
 }

@@ -19,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 /**
  *
  * @author mauriciochirino
@@ -26,9 +27,12 @@ import javax.ws.rs.core.UriInfo;
 @Path("/session")
 public class SessionResource {
 
-    @Context UriInfo uriInfo;
-    @Context Request request;
-    @Context HttpHeaders headers;
+    @Context
+    UriInfo uriInfo;
+    @Context
+    Request request;
+    @Context
+    HttpHeaders headers;
     String id;
 
     public SessionResource(UriInfo uriInfo, Request request, String id, HttpHeaders headers) {
@@ -42,10 +46,8 @@ public class SessionResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response registrarUsuario(String content) {
-        
         WebServiceStatus status = null;
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
-
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
         // response to be filled through the handler.
@@ -65,17 +67,26 @@ public class SessionResource {
         sessionPOSTHandler handler = new sessionPOSTHandler();
         try {
             status = handler.run(webRequest, webResponse);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // catching any unexpected exception
             status = WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
+            System.err.println("Excepcion: " + e.getLocalizedMessage());
+            StackTraceElement[] aux = e.getStackTrace();
+            separation(120);
+            for (int i = 0; i < aux.length; i++) {
+                System.out.println("Traza nº " + (i + 1));
+                System.out.println("Clase: " + aux[i].getClassName());
+                System.out.println("Metodo: " + aux[i].getMethodName());
+                System.out.println("Linea: " + aux[i].getLineNumber());
+                separation(120);
+            }
             return WebServiceHandler.okResponseFromStatus(status, mediaType);
         }
-         //---------------------------------------------------------------------
+        //---------------------------------------------------------------------
         // Enconding response in UTF-8.
         //---------------------------------------------------------------------
         webResponse.setUTF8Encoding(mediaType);
-         //---------------------------------------------------------------------
+        //---------------------------------------------------------------------
         // Returning the appropriate response according to the status
         //---------------------------------------------------------------------
         if (status.ok()) {
@@ -84,7 +95,13 @@ public class SessionResource {
         } else {
             return WebServiceHandler.okResponseFromStatus(status, mediaType);
         }
-        
         //return Response.status(Response.Status.CREATED).build();
+    }
+
+    private void separation(int limit) {
+        for (int j = 0; j < limit; j++) {
+            System.out.print("-");
+        }
+        System.out.println("");
     }
 }

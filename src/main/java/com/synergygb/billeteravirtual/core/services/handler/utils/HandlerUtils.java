@@ -1,6 +1,5 @@
 package com.synergygb.billeteravirtual.core.services.handler.utils;
 
-
 import com.synergygb.billeteravirtual.core.services.params.GeneralParams;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunicationType;
 import com.synergygb.webAPI.parameters.WebServiceParameters;

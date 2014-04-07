@@ -44,5 +44,5 @@ public class UserInfo implements Serializable {
     public void setStime(String stime) {
         this.stime = stime;
     }
-
+    //sobreescribir el metodo toString() para que produzca formato JSON
 }

@@ -18,11 +18,11 @@
  */
 package com.synergygb.billeteravirtual.notificacion.communication;
 
-import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
-import com.synergygb.billeteravirtual.core.connector.cache.models.CouchbaseKeyPrefix;
+import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.UnauthorizedUserException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
@@ -58,6 +58,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
     public LoginPOSTCommunication(GenericMemcachedConnector cacheConnector) {
+        //System.setProperty("viewmode", "development");
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -76,12 +77,11 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         try {
             loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
             if(!initInput(loginModel)){
-                return LayerDataObject.buildFromObject(info);//retorno una respuesta vacía en caso que no exista el usuario en la BD
+                throw new AuthenticationException("bad password or user name");
             }
         } catch (LayerDataObjectToObjectParseException ex) {
             java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo del login", ex);
-        } catch (LayerDataObjectParseException ex) {
-            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un error obteniendo el LDO del login vacío", ex);
+            throw new LayerCommunicationException();
         }
         //Parsing response
         info = initLoginInfo(loginModel);
@@ -96,12 +96,15 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
 
     //------ Pregunta ----------
     private boolean initInput(LoginParamsModel loginModel) {
-        logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD" + loginModel.getCi() ));
+        logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi() ));
         try {
-            String user = (String) cacheConnector.get("user-"+loginModel.getCi());
-            System.out.println("retornado: "+user);
-            if(user.equals("{\"error\":\"not_found\",\"reason\":\"missing\"}") || user == null){
+            Object user = cacheConnector.get("user-"+loginModel.getCi());
+            if(user == null){
+                System.out.println("Usuario no registrado");
                 return false;
+            }
+            else{
+                System.out.println("encontrado: "+user.toString());
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario" + loginModel.getCi()));
@@ -125,6 +128,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         //returning response
         return info;
     }
+    
     /*
      private void validateCommunicationStatus(LoginResponseE response) throws LayerCommunicationException {
      Result result = response.getLoginResponse().get_return().getResult();

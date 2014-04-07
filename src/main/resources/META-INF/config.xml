@@ -19,7 +19,7 @@
     </moduleCache>    
     <!-- MODULE STATS PARAMETERS -->
     <moduleStats>
-        <bucketName>default</bucketName>
+        <bucketName>billetera</bucketName>
         <bucketPassword></bucketPassword>
         <poolSize>200</poolSize>
         <objectsSecs>3600</objectsSecs>

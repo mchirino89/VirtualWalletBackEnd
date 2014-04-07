@@ -69,5 +69,7 @@ public class LoginParamsModel implements Serializable {
     public void setCi(String ci) {
         this.ci = ci;
     }
-
+    public String toString(){
+        return "{\"ci\": \""+this.ci+", \"pass\":\""+this.pass+"}";
+    }
 }

@@ -87,6 +87,7 @@ public class GenericMemcachedConnector<T extends CouchbaseClient> implements Cac
      * @throws com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException
      */
     public Object get(String key) throws CouchbaseOperationException {
+        
         T cacheClient = null;
         try {
             cacheClient = cacheClientObjectPool.borrowObject();
@@ -202,6 +203,6 @@ public class GenericMemcachedConnector<T extends CouchbaseClient> implements Cac
 
     @Override
     public void save(String prefix, List<Object> entities, String cookie) throws CouchbaseOperationException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
