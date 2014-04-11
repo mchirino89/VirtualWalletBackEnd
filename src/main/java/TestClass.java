@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 import com.couchbase.client.protocol.views.DesignDocument;
@@ -27,14 +28,16 @@ import java.util.logging.Logger;
 public class TestClass {
 
     private static final int EXP_TIME = 0;
-    private static final String KEY = "instrument-";
+    private static final String KEY = "card-";
     private final String cedulas[] = {"18839634", "19000000", "15000000"};
+    private final String prov[] = {"Master Card", "American Express", "Visa", "Maestro", "Dinner Club"};
+    private final String ref[] = {"egw28hol0uzoa3dqsfd1nxc9gylvyr","4l3jnnb4m4tso0ugg7y49ecd09956f","5e8f05cxujszzvlxa0egvueahtevp0","vabcdd2egf0jn36cjj1ima5w9gkpt2","dh9olmopd2fpfzo2uuiwbo1vsnt2bo","098sz29z75bh2gg46ddi7v8eewhhd9","1ppuowzk97jv2fm7rh20g9zptqwzkx","ii827ohur9lwu2u5q9n0jyrvzq9rqs","vz5lr484x79kuwx8gbvbv0gwxz20w3"};
     private StringBuilder sb;
-    private ArrayList<String>cards;
+    private Random aleatorio;
 
     public TestClass() {
         CouchbaseClient client = null;
-        cards = new ArrayList<String>();
+        aleatorio = new Random();
         System.setProperty("viewmode", "development");
         CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
         cfb.setOpTimeout(10000);//10 seconds for operation timeout
@@ -44,15 +47,13 @@ public class TestClass {
             List<URI> serverList = new ArrayList<URI>();
             serverList.add(server);
             client = new CouchbaseClient(serverList, "billetera", "");
-            //borradoInstrumentos(client);
-            
             //------- Llenando la bd -----
-            //llenadoInstrumentos(client);
+            //borradoInstrumentos(client);
+            llenadoRef(client);
             //------- listar bd -----------
-            listadoInstrumentos(client);
+            listado(client,false);
             //------- Creacion de vistas -------
             //creacionDeVista(client);
-            
             client.shutdown();
         } catch (URISyntaxException ex) {
             Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, "Problemas con el pool de direcciones", ex);
@@ -60,13 +61,13 @@ public class TestClass {
             Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, "Problemas con el cableado de la bd", ex);
         }
     }
-    
+
     private void borradoInstrumentos(CouchbaseClient client) {
-        for (String  cedula: cedulas) {
+        for (String cedula : this.ref) {
             try {
-                System.out.println("exito: "+client.delete(cedula).get());
+                System.out.println("exito: " + client.delete("instruments-" + cedula).get());
             } catch (InterruptedException ex) {
-                Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, null, "interrumpcion del borrado");
+                Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, null, "interrupcion del borrado");
             } catch (ExecutionException ex) {
                 Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, null, "peos en la ejecucion");
             }
@@ -79,15 +80,15 @@ public class TestClass {
 
     private void llenadoInstrumentos(CouchbaseClient client) {
         for (String cedula : cedulas) {
-            Instrument[] tarj = new Instrument[2];
-            for (int i = 0; i < 2; i++) {
+            Instrument[] tarj = new Instrument[1 + aleatorio.nextInt(3)];
+            for (int i = 0; i < tarj.length; i++) {
                 tarj[i] = new Instrument(generaCadena(8), generaCadena(30));
             }
             client.set(KEY + cedula, EXP_TIME, new Instruments(tarj));
         }
     }
-    
-    private String generaCadena(int longitud){
+
+    private String generaCadena(int longitud) {
         char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
         sb = new StringBuilder();
         Random random = new Random();
@@ -99,20 +100,28 @@ public class TestClass {
 
     private void llenado(CouchbaseClient client) {
         for (String cedula : cedulas) {
-            client.set(KEY + cedula, EXP_TIME, new Wallet());
+            client.set(KEY + cedula, EXP_TIME, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex("1234")));
+            //client.set(KEY + cedula, EXP_TIME, new Wallet());
         }
     }
 
-    private void listadoInstrumentos(CouchbaseClient client) {     
-        for (String cedula : cedulas) {
-            System.out.println("Instrumento: " + cedula + " - \n" + client.get(KEY+cedula)+"\n");
+    private void llenadoRef(CouchbaseClient client) {
+        for (String ref : this.ref) {
+            client.set(KEY + ref, EXP_TIME, new Card(5000 + aleatorio.nextInt(5000), prov[aleatorio.nextInt(prov.length)]));
+            //client.set(KEY + cedula, EXP_TIME, new Wallet());
         }
     }
-    
-    private void listado(CouchbaseClient client) {
-        for (String cedula : cedulas) {
-            System.out.println("Wallet: " + cedula + " - " + client.get(KEY + cedula));
+
+    private void listado(CouchbaseClient client, boolean tipo) {
+        if (tipo) {
+            for (String cedula : cedulas) {
+                System.out.println(KEY + cedula + " - " + client.get(KEY + cedula));
+            }
         }
+        else
+            for (String referencia : this.ref) {
+                System.out.println(KEY + referencia + " - " + client.get(KEY + referencia));
+            }
     }
 
     private void creacionDeVista(CouchbaseClient client) {

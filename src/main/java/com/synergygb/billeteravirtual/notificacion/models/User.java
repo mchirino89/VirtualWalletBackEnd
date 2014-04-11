@@ -1,5 +1,7 @@
+package com.synergygb.billeteravirtual.notificacion.models;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -10,6 +12,7 @@ import java.io.Serializable;
  *
  * @author mauricio chirino
  */
+@XmlRootElement
 public class User implements Serializable {
 
     private String pass;

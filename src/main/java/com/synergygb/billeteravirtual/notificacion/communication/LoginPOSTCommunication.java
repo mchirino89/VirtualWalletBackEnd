@@ -18,11 +18,11 @@
  */
 package com.synergygb.billeteravirtual.notificacion.communication;
 
+import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
-import com.synergygb.billeteravirtual.core.exceptions.UnauthorizedUserException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
@@ -54,6 +54,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
 
     private static final Logger logger = Logger.getLogger(LoginPOSTCommunication.class);
     private GenericMemcachedConnector cacheConnector;
+    private User respuesta;
     WSLog wsLog = new WSLog("Communcation Login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
@@ -69,6 +70,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         // Declaring parsing variables
         //------------------------------------------------------------------
         LoginParamsModel loginModel = null;
+        respuesta = null;
         LayerDataObject ldoResponse;
         UserInfo info = null;
         //---------------------------------------------------------------------
@@ -98,13 +100,14 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     private boolean initInput(LoginParamsModel loginModel) {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi() ));
         try {
-            Object user = cacheConnector.get("user-"+loginModel.getCi());
-            if(user == null){
+            User obj;
+            obj = (User)cacheConnector.get("user-"+loginModel.getCi());
+            if(obj == null){
                 System.out.println("Usuario no registrado");
                 return false;
             }
             else{
-                System.out.println("encontrado: "+user.toString());
+                System.out.println("JSON pass: "+obj.getPass());
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario" + loginModel.getCi()));
@@ -129,33 +132,4 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         return info;
     }
     
-    /*
-     private void validateCommunicationStatus(LoginResponseE response) throws LayerCommunicationException {
-     Result result = response.getLoginResponse().get_return().getResult();
-
-     switch (result.getOperationCode()) {
-     case 1:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "Ocurrio un error con el parametro tipo de documento"));
-     throw new LayerCommunicationException();
-     case 2:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "Ocurrio un error con el parametro ci"));
-     throw new LayerCommunicationException();
-     case 3:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "Ocurrio un error con el parametro password"));
-     throw new LayerCommunicationException();
-     case 4:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "contrasena invalida"));
-     throw new AuthenticationException();
-     case 5:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "El certificado no existe"));
-     throw new LayerCommunicationException();
-     case 6:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "El usuario no existe"));
-     throw new NonExistingUser();
-     case 99:
-     logger.debug(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.INVALID_DATA.getId(), "Ocurrio un error inesperado"));
-     throw new LayerCommunicationException();
-     }
-     }
-     */
 }

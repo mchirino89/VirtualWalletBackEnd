@@ -16,8 +16,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Card implements Serializable {
 
     private int ultDigito;
-    private String proveedor, id;
+    private String proveedor;
 
+    public Card() {
+    }
+
+    public Card(int ultDigito, String proveedor) {
+        this.ultDigito = ultDigito;
+        this.proveedor = proveedor;
+    }
+    
     public int getUltDigito() {
         return ultDigito;
     }
@@ -33,13 +41,10 @@ public class Card implements Serializable {
     public void setProveedor(String proveedor) {
         this.proveedor = proveedor;
     }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    
+    @Override
+    public String toString(){
+        return "{\"proveedor\": \""+this.proveedor+"\", \"ultDig\": \""+this.ultDigito+"\"}";
     }
     
 }

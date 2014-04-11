@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 @Path("/session")
 public class SessionResource {
 
+    private static int divisor = 80;
     @Context
     UriInfo uriInfo;
     @Context
@@ -72,13 +73,13 @@ public class SessionResource {
             status = WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
             System.err.println("Excepcion: " + e.getLocalizedMessage());
             StackTraceElement[] aux = e.getStackTrace();
-            separation(120);
+            separation(divisor);
             for (int i = 0; i < aux.length; i++) {
                 System.out.println("Traza nº " + (i + 1));
                 System.out.println("Clase: " + aux[i].getClassName());
                 System.out.println("Metodo: " + aux[i].getMethodName());
                 System.out.println("Linea: " + aux[i].getLineNumber());
-                separation(120);
+                separation(divisor);
             }
             return WebServiceHandler.okResponseFromStatus(status, mediaType);
         }
