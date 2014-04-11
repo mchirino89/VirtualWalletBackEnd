@@ -54,15 +54,10 @@ public class Communication {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
         LoginPOSTCommunication postLoginCommunication = new LoginPOSTCommunication(cacheConnector);
 
-        UserInfo loginResult = (UserInfo) postLoginCommunication.communicate(ct, loginInputLDO).toObject(UserInfo.class);
+        UserInfo loginResult;
+        LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);
+        loginResult = (UserInfo) response.toObject(UserInfo.class);
 
         return loginResult;
     }
-    /*
-    public static void registerUser(DataLayerCommunicationType communicationType, RegisterParamsModel user) throws LayerDataObjectParseException, LayerCommunicationException {
-        RegisterPOSTCommunication postRegisterCommunication = new RegisterPOSTCommunication();
-        LayerDataObject registerInputLDO = LayerDataObject.buildFromObject(user);
-        postRegisterCommunication.communicate(communicationType, registerInputLDO, new RegisterUserDummy());
-    }
-    */
 }

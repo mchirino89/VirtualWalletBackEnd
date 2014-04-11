@@ -1,8 +1,8 @@
 package com.synergygb.billeteravirtual.notificacion.models;
 
 import java.io.Serializable;
-import java.util.List;
 import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class UserInfo implements Serializable {
 
     private String stime;
-    private List<Card> instrumentos;
+    private ArrayList<Card> instrumentos;
     private UserSession session;
 
     public UserSession getSession() {
@@ -26,11 +26,11 @@ public class UserInfo implements Serializable {
         this.session = session;
     }
 
-    public List<Card> getInstrumentos() {
+    public ArrayList<Card> getInstrumentos() {
         return instrumentos;
     }
 
-    public void setInstrumentos(List<Card> instrumentos) {
+    public void setInstrumentos(ArrayList<Card> instrumentos) {
         this.instrumentos = instrumentos;
     }
 

@@ -32,8 +32,10 @@ import com.synergygb.webAPI.layerCommunication.WebServiceResponse;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
+import com.synergygb.webAPI.parameters.WSParamObject;
 import com.synergygb.webAPI.parameters.WebServiceParameters;
 import java.util.Date;
+import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -112,6 +114,16 @@ public class sessionPOSTHandler extends WebServiceHandler {
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         } 
         response.addProperty(GenericParams.USER_COOKIE, cookie);
+        
+        LayerDataObject responseLoginLDO = null;
+        try {
+           responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
+        } catch (LayerDataObjectParseException ex) {
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
+            return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
+        }
+        response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
+        System.out.println(responseLoginLDO.getParametersAsString());
         //response.addParamFromLDO("objeto", responseLogin);
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }

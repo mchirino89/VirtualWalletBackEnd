@@ -80,30 +80,6 @@ public class GenericMemcachedConnector<T extends CouchbaseClient> implements Cac
             }
         }
     }
-    /**
-     * Gets 
-     * @param key
-     * @return Any ocurrency matching the key.
-     * @throws com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException
-     */
-    public Object get(String key) throws CouchbaseOperationException {
-        
-        T cacheClient = null;
-        try {
-            cacheClient = cacheClientObjectPool.borrowObject();
-            return (Object) cacheClient.get(key);
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (Exception ex) {
-            throw new CouchbaseOperationException("Problemas consultando: "+ex.getMessage());
-        } finally {
-            try {
-                cacheClientObjectPool.returnObject(cacheClient);
-            } catch (Exception ex) {
-                throw new CouchbaseOperationException("Problemas retornando el resultado: "+ex.getMessage());
-            }
-        }
-    }
 
     /**
      * {@inheritDoc}

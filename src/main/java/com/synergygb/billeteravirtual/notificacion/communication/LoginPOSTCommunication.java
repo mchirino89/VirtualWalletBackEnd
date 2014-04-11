@@ -38,6 +38,10 @@ import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import com.synergygb.billeteravirtual.params.GenericParams;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -78,7 +82,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         //---------------------------------------------------------------------
         try {
             loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
-            if(!initInput(loginModel)){
+            if (!initInput(loginModel)) {
                 throw new AuthenticationException("bad password or user name");
             }
         } catch (LayerDataObjectToObjectParseException ex) {
@@ -98,16 +102,12 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
 
     //------ Pregunta ----------
     private boolean initInput(LoginParamsModel loginModel) {
-        logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi() ));
+        logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi()));
         try {
-            User obj;
-            obj = (User)cacheConnector.get("user-"+loginModel.getCi());
-            if(obj == null){
+            respuesta = (User) cacheConnector.get(GenericParams.USER, loginModel.getCi());
+            if (respuesta == null) {
                 System.out.println("Usuario no registrado");
                 return false;
-            }
-            else{
-                System.out.println("JSON pass: "+obj.getPass());
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario" + loginModel.getCi()));
@@ -119,17 +119,30 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     private UserInfo initLoginInfo(LoginParamsModel loginModel) {
         UserInfo info = new UserInfo();
         UserSession session = new UserSession();
-
         //Parsing session
         session.setPassword(loginModel.getPass());
         session.setLoginCi(loginModel.getCi());
-
+        //Getting card's info
+        try {
+            Instruments registradas = (Instruments)cacheConnector.get(GenericParams.INSTRUMENTS, loginModel.getCi());
+            if (registradas == null) {
+                System.out.println("Usuario sin intrumentos registrados");
+            }
+            else{
+                ArrayList<Card> guardadas = new ArrayList<Card>();
+                for(Instrument tmp: registradas.getTarjetas()){
+                    Card auxiliar = (Card)cacheConnector.get(GenericParams.CARD, tmp.getExternalId());
+                    guardadas.add(auxiliar);
+                }
+                info.setInstrumentos(guardadas);
+            }
+        } catch (CouchbaseOperationException ex) {
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
+        }
         //Parsing userInfo
-        //----- Consulta para traerme todas los instrumentos de un determinado usuario
         info.setSession(session);
         info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
         //returning response
         return info;
     }
-    
 }

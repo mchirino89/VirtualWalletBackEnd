@@ -12,5 +12,10 @@ package com.synergygb.billeteravirtual.params;
  */
 public class GenericParams {
     public static final String USER_COOKIE = "cookie";
-    public static final String INSTRUMENTS_ALIAS = "alias";
+    public static final String INSTRUMENTS_ALIAS = "aliasList";
+    public static final String USER = "user-";
+    public static final String INSTRUMENTS = "instruments-";
+    public static final String WALLET = "wallet-";
+    public static final String CARD = "card-";
+    public static final String SESSION = "session-";
 }
