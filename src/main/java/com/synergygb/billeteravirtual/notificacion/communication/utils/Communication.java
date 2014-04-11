@@ -60,4 +60,15 @@ public class Communication {
 
         return loginResult;
     }
+    
+    public static UserInfo postRegistrationData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
+        RegistrationPOSTCommunication postLoginCommunication = new RegistrationPOSTCommunication(cacheConnector);
+
+        UserInfo loginResult;
+        LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);
+        loginResult = (UserInfo) response.toObject(UserInfo.class);
+
+        return loginResult;
+    }
 }

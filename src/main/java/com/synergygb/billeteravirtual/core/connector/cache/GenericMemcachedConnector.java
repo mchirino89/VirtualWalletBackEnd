@@ -46,7 +46,7 @@ public class GenericMemcachedConnector<T extends CouchbaseClient> implements Cac
         T cacheClient = null;
         try {
             cacheClient = cacheClientObjectPool.borrowObject();
-            int secs = secsInCache;
+            int secs = 0;
             cacheClient.set(key, secs, obj);
         } catch (Exception ex) {
             throw new CouchbaseOperationException(ex.getMessage());

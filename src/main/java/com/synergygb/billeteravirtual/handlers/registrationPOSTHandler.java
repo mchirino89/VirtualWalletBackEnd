@@ -42,13 +42,13 @@ import org.apache.log4j.PatternLayout;
  *
  *  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  */
-public class sessionPOSTHandler extends WebServiceHandler {
+public class registrationPOSTHandler extends WebServiceHandler {
 
-    private static final Logger logger = Logger.getLogger(sessionPOSTHandler.class);
+    private static final Logger logger = Logger.getLogger(registrationPOSTHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
-    public sessionPOSTHandler() {
+    public registrationPOSTHandler() {
         logger.addAppender(conappender);
     }
 
@@ -57,11 +57,9 @@ public class sessionPOSTHandler extends WebServiceHandler {
         //-----------------------------------------------------
         // Declaring parsing variables
         //-----------------------------------------------------
-        String cookie = null;
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType;
         LoginParamsModel loginModel = null;
-        long totalServiceTime = new Date().getTime();
         //-----------------------------------------------------
         // Declaring connector 
         //-----------------------------------------------------
@@ -93,8 +91,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         UserInfo responseLogin = null;
         try {
-            cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
-            responseLogin = Communication.postLoginData(communicationType, loginModel, cacheConnector);
+            responseLogin = Communication.postRegistrationData(communicationType, loginModel, cacheConnector);
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.AUTHENTICATION_ERROR);
@@ -110,17 +107,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         } catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
-        } 
-        response.addProperty(GenericParams.USER_COOKIE, cookie);
-        LayerDataObject responseLoginLDO = null;
-        try {
-           responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
-        } catch (LayerDataObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
-            return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
         }
-        response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
-        //System.out.println(responseLoginLDO.getParameter("instrumentos"));
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
 }

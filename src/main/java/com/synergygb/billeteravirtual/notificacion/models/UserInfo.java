@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class UserInfo implements Serializable {
 
     private String stime;
-    private ArrayList<Card> instrumentos;
+    private ArrayList<Card> aliasList;
     private UserSession session;
 
     public UserSession getSession() {
@@ -27,11 +27,11 @@ public class UserInfo implements Serializable {
     }
 
     public ArrayList<Card> getInstrumentos() {
-        return instrumentos;
+        return aliasList;
     }
 
     public void setInstrumentos(ArrayList<Card> instrumentos) {
-        this.instrumentos = instrumentos;
+        this.aliasList = instrumentos;
     }
 
     public UserInfo() {

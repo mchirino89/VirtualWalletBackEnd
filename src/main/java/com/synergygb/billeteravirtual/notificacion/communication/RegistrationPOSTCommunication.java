@@ -18,14 +18,11 @@
  */
 package com.synergygb.billeteravirtual.notificacion.communication;
 
-
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
-import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
@@ -33,13 +30,10 @@ import com.synergygb.webAPI.layerCommunication.DataLayerCommunication;
 import com.synergygb.webAPI.layerCommunication.LayerDataObject;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
-import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
-import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
-import java.util.ArrayList;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -52,15 +46,14 @@ import java.util.ArrayList;
  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  * @version 1.0
  */
-public class LoginPOSTCommunication extends DataLayerCommunication {
+public class RegistrationPOSTCommunication extends DataLayerCommunication {
 
-    private static final Logger logger = Logger.getLogger(LoginPOSTCommunication.class);
+    private static final Logger logger = Logger.getLogger(RegistrationPOSTCommunication.class);
     private GenericMemcachedConnector cacheConnector;
-    private User respuesta;
     WSLog wsLog = new WSLog("Communcation Login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
-    public LoginPOSTCommunication(GenericMemcachedConnector cacheConnector) {
+    public RegistrationPOSTCommunication(GenericMemcachedConnector cacheConnector) {
         //System.setProperty("viewmode", "development");
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
@@ -72,21 +65,8 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         // Declaring parsing variables
         //------------------------------------------------------------------
         LoginParamsModel loginModel = null;
-        respuesta = null;
         LayerDataObject ldoResponse;
         UserInfo info = null;
-        //---------------------------------------------------------------------
-        // Parsing the request parameters.
-        //---------------------------------------------------------------------
-        try {
-            loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
-            if (!initInput(loginModel)) {
-                throw new AuthenticationException("bad password or user name");
-            }
-        } catch (LayerDataObjectToObjectParseException ex) {
-            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo del login", ex);
-            throw new LayerCommunicationException();
-        }
         //Parsing response
         info = initLoginInfo(loginModel);
         try {
@@ -98,47 +78,17 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         return ldoResponse;
     }
 
-    //------ Pregunta ----------
-    private boolean initInput(LoginParamsModel loginModel) {
-        logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi()));
-        try {
-            respuesta = (User) cacheConnector.get(GenericParams.USER, loginModel.getCi());
-            if (respuesta == null) {
-                System.out.println("Usuario no registrado");
-                return false;
-            }
-        } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario" + loginModel.getCi()));
-        }
-        return true;
-    }
-
     //------ Respuesta ---------
     private UserInfo initLoginInfo(LoginParamsModel loginModel) {
         UserInfo info = new UserInfo();
-        UserSession session = new UserSession();
-        //Parsing session
-        session.setPassword(loginModel.getPass());
-        session.setLoginCi(loginModel.getCi());
         //Getting card's info
         try {
-            Instruments registradas = (Instruments)cacheConnector.get(GenericParams.INSTRUMENTS, loginModel.getCi());
-            if (registradas == null) {
-                System.out.println("Usuario sin intrumentos registrados");
-            }
-            else{
-                ArrayList<Card> guardadas = new ArrayList<Card>();
-                for(Instrument tmp: registradas.getTarjetas()){
-                    Card auxiliar = (Card)cacheConnector.get(GenericParams.CARD, tmp.getExternalId());
-                    guardadas.add(auxiliar);
-                }
-                info.setInstrumentos(guardadas);
-            }
+            System.out.println("A guardar: "+GenericParams.USER+loginModel.getCi());
+            cacheConnector.save(GenericParams.USER, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginModel.getPass())), loginModel.getCi());
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
         }
         //Parsing userInfo
-        info.setSession(session);
         info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
         //returning response
         return info;
