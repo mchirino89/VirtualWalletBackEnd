@@ -29,12 +29,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.synergygb</groupId>
-            <artifactId>web-services-api</artifactId>
-            <version>1.2.2-jdk16</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>6.0</version>

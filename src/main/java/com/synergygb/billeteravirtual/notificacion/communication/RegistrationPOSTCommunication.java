@@ -84,7 +84,7 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
         //Getting card's info
         try {
             System.out.println("A guardar: "+GenericParams.USER+loginModel.getCi());
-            cacheConnector.save(GenericParams.USER, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginModel.getPass())), loginModel.getCi());
+            cacheConnector.save(GenericParams.USER + loginModel.getCi(), new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginModel.getPass())), loginModel.getCi());
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
         }
