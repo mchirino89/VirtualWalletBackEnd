@@ -7,8 +7,6 @@ package com.synergygb.billeteravirtual.handlers;
 
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
-import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
-import com.synergygb.billeteravirtual.core.utils.CookieUtils;
 import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
 import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
@@ -18,8 +16,9 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
+import com.synergygb.billeteravirtual.notificacion.communication.RegistrationPOSTCommunication;
+import com.synergygb.billeteravirtual.notificacion.communication.exceptions.PreexistingUserException;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
-import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
@@ -33,7 +32,7 @@ import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationExce
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
 import com.synergygb.webAPI.parameters.WebServiceParameters;
-import java.util.Date;
+import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -92,10 +91,7 @@ public class registrationPOSTHandler extends WebServiceHandler {
         UserInfo responseLogin = null;
         try {
             responseLogin = Communication.postRegistrationData(communicationType, loginModel, cacheConnector);
-        } catch (AuthenticationException ex) {
-            logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
-            return WebServiceStatus.buildStatus(WebServiceStatusType.AUTHENTICATION_ERROR);
-        } catch (BackendException ex) {
+        }  catch (BackendException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LAYER_COMMUNICATION.getId(), "Error de backend "), ex);
             return WebServiceStatus.buildStatus(new BackendErrorStatus(BackendErrorStatus.STATUS_CODE + "_" + ex.getMessage()));
         } catch (LayerCommunicationException ex) {
@@ -104,7 +100,8 @@ public class registrationPOSTHandler extends WebServiceHandler {
         } catch (LayerDataObjectToObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
-        } catch (LayerDataObjectParseException ex) {
+        } 
+        catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         }

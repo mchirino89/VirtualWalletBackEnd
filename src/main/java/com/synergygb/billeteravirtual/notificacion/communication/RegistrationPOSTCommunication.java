@@ -22,6 +22,7 @@ import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
+import com.synergygb.billeteravirtual.notificacion.communication.exceptions.PreexistingUserException;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
@@ -34,6 +35,8 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
+import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
+import java.util.logging.Level;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -54,7 +57,6 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
     public RegistrationPOSTCommunication(GenericMemcachedConnector cacheConnector) {
-        //System.setProperty("viewmode", "development");
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -67,6 +69,15 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
         LoginParamsModel loginModel = null;
         LayerDataObject ldoResponse;
         UserInfo info = null;
+        //---------------------------------------------------------------------
+        // Parsing the request parameters.
+        //---------------------------------------------------------------------
+        try {
+            loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
+        } catch (LayerDataObjectToObjectParseException ex) {
+            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo de los parametros ", ex);
+            throw new LayerCommunicationException();
+        }
         //Parsing response
         info = initLoginInfo(loginModel);
         try {
@@ -79,15 +90,19 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
     }
 
     //------ Respuesta ---------
-    private UserInfo initLoginInfo(LoginParamsModel loginModel) {
+    private UserInfo initLoginInfo(LoginParamsModel loginModel) throws PreexistingUserException {
         UserInfo info = new UserInfo();
-        //Getting card's info
         try {
-            System.out.println("A guardar: "+GenericParams.USER+loginModel.getCi());
-            cacheConnector.save(GenericParams.USER + loginModel.getCi(), new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginModel.getPass())), loginModel.getCi());
+            User respuesta = (User) cacheConnector.get(GenericParams.USER, loginModel.getCi());
+            if (respuesta == null) {
+                cacheConnector.save(GenericParams.USER, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginModel.getPass())), loginModel.getCi());
+            }
+            else{
+                throw new PreexistingUserException();
+            }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
-        }
+        } 
         //Parsing userInfo
         info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
         //returning response

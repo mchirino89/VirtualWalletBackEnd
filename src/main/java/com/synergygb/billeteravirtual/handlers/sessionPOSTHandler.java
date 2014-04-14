@@ -111,7 +111,6 @@ public class sessionPOSTHandler extends WebServiceHandler {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         } 
-        response.addProperty(GenericParams.USER_COOKIE, cookie);
         LayerDataObject responseLoginLDO = null;
         try {
            responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
@@ -120,7 +119,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
             return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
         }
         response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
-        //System.out.println(responseLoginLDO.getParameter("instrumentos"));
+        response.addProperty(GenericParams.USER_COOKIE, cookie);
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
 }

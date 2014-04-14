@@ -18,12 +18,13 @@
  */
 package com.synergygb.billeteravirtual.notificacion.communication;
 
-
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.NonExistingUser;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
+import com.synergygb.billeteravirtual.notificacion.communication.exceptions.DisableWalletException;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
@@ -61,7 +62,6 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
     public LoginPOSTCommunication(GenericMemcachedConnector cacheConnector) {
-        //System.setProperty("viewmode", "development");
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -81,7 +81,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         try {
             loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
             if (!initInput(loginModel)) {
-                throw new AuthenticationException("bad password or user name");
+                throw new NonExistingUser("Usuario incorrecto");
             }
         } catch (LayerDataObjectToObjectParseException ex) {
             java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo del login", ex);
@@ -106,10 +106,32 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
             if (respuesta == null) {
                 System.out.println("Usuario no registrado");
                 return false;
+            } else {
+                if (!respuesta.getPass().equals(loginModel.getPass())) {
+                    throw new AuthenticationException();
+                }
+                /*
+                Wallet userWallet = (Wallet)cacheConnector.get(GenericParams.WALLET, loginModel.getCi());
+                if (!userWallet.getFlag().equals("1")) {
+                    throw new DisableWalletException();
+                }
+                        */
             }
         } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario" + loginModel.getCi()));
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario " + loginModel.getCi()));
+            return false;
+        } catch (AuthenticationException ex) {
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Clave incorrecta para el usuario " + loginModel.getCi()));
+            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, null, "Clave incorrecta");
+            return false;
+        } 
+        /*
+        catch (DisableWalletException ex) {
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Billetera no activa para el usuario " + loginModel.getCi()));
+            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, null, "Billetera no activa");
+            return false;
         }
+                */
         return true;
     }
 
@@ -117,19 +139,16 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     private UserInfo initLoginInfo(LoginParamsModel loginModel) {
         UserInfo info = new UserInfo();
         UserSession session = new UserSession();
-        //Parsing session
-        session.setPassword(loginModel.getPass());
-        session.setLoginCi(loginModel.getCi());
         //Getting card's info
         try {
-            Instruments registradas = (Instruments)cacheConnector.get(GenericParams.INSTRUMENTS, loginModel.getCi());
+            Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, loginModel.getCi());
             if (registradas == null) {
                 System.out.println("Usuario sin intrumentos registrados");
-            }
-            else{
+                info.setInstrumentos(new ArrayList<Card>());
+            } else {
                 ArrayList<Card> guardadas = new ArrayList<Card>();
-                for(Instrument tmp: registradas.getTarjetas()){
-                    Card auxiliar = (Card)cacheConnector.get(GenericParams.CARD, tmp.getExternalId());
+                for (Instrument tmp : registradas.getTarjetas()) {
+                    Card auxiliar = (Card) cacheConnector.get(GenericParams.CARD, tmp.getExternalId());
                     guardadas.add(auxiliar);
                 }
                 info.setInstrumentos(guardadas);

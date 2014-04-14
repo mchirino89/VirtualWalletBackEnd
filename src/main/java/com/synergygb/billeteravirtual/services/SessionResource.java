@@ -46,7 +46,7 @@ public class SessionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registrarUsuario(String content) {
+    public Response logUser(String content) {
         WebServiceStatus status = null;
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
         //---------------------------------------------------------------------

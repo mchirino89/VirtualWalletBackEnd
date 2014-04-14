@@ -35,14 +35,6 @@ public class UserSession implements Serializable {
      */
     String lastUpdate;
     /**
-     * Login name
-     */
-    String loginCi;
-    /**
-     * User password
-     */
-    String password;
-    /**
      * Session start time
      */
     String sessionStart;
@@ -51,14 +43,6 @@ public class UserSession implements Serializable {
         Date date = new Date();
         this.lastUpdate = String.valueOf(new Timestamp(date.getTime()));
         this.sessionStart = String.valueOf(new Timestamp(date.getTime()));
-    }
-
-    public String getLoginCi() {
-        return loginCi;
-    }
-
-    public void setLoginCi(String loginCi) {
-        this.loginCi = loginCi;
     }
 
     public String getLastUpdate() {
@@ -74,14 +58,6 @@ public class UserSession implements Serializable {
         this.lastUpdate = String.valueOf(new Date(zero).getTime());
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getSessionStart() {
         return sessionStart;
     }
@@ -92,6 +68,6 @@ public class UserSession implements Serializable {
 
     @Override
     public String toString() {
-        return "UserSession{" + "lastUpdate=" + lastUpdate + ", password=" + password + ", loginCi=" + loginCi + '}';
+        return "UserSession{" + "lastUpdate=" + lastUpdate + '}';
     }
 }
