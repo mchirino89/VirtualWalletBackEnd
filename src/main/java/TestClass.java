@@ -63,9 +63,9 @@ public class TestClass {
     }
 
     private void borradoInstrumentos(CouchbaseClient client) {
-        for (String cedula : this.ref) {
+        for (String apuntador : this.ref) {
             try {
-                System.out.println("exito: " + client.delete("instruments-" + cedula).get());
+                System.out.println("exito: " + client.delete(KEY + apuntador).get());
             } catch (InterruptedException ex) {
                 Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, null, "interrupcion del borrado");
             } catch (ExecutionException ex) {
@@ -106,8 +106,8 @@ public class TestClass {
     }
 
     private void llenadoRef(CouchbaseClient client) {
-        for (String ref : this.ref) {
-            client.set(KEY + ref, EXP_TIME, new Card(5000 + aleatorio.nextInt(5000), prov[aleatorio.nextInt(prov.length)]));
+        for (String apuntador : this.ref) {
+            client.set(KEY + apuntador, EXP_TIME, new Card(String.valueOf(5000 + aleatorio.nextInt(5000)), prov[aleatorio.nextInt(prov.length)]));
             //client.set(KEY + cedula, EXP_TIME, new Wallet());
         }
     }

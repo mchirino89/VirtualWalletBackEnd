@@ -15,22 +15,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Card implements Serializable {
 
-    private int ultDigito;
+    private String ultDigito;
     private String proveedor;
 
     public Card() {
     }
 
-    public Card(int ultDigito, String proveedor) {
+    public Card(String ultDigito, String proveedor) {
         this.ultDigito = ultDigito;
         this.proveedor = proveedor;
     }
     
-    public int getUltDigito() {
+    public String getUltDigito() {
         return ultDigito;
     }
 
-    public void setUltDigito(int ultDigito) {
+    public void setUltDigito(String ultDigito) {
         this.ultDigito = ultDigito;
     }
 
