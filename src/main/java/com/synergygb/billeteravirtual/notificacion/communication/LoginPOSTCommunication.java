@@ -138,7 +138,6 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     //------ Respuesta ---------
     private UserInfo initLoginInfo(LoginParamsModel loginModel) {
         UserInfo info = new UserInfo();
-        UserSession session = new UserSession();
         //Getting card's info
         try {
             Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, loginModel.getCi());
@@ -149,7 +148,8 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
                 ArrayList<Card> guardadas = new ArrayList<Card>();
                 for (Instrument tmp : registradas.getTarjetas()) {
                     Card auxiliar = (Card) cacheConnector.get(GenericParams.CARD, tmp.getExternalId());
-                    guardadas.add(auxiliar);
+                    if(auxiliar.getActiva().equals("1"))// Mostrando sólo aquellas tarjetas activas.
+                        guardadas.add(auxiliar);
                 }
                 info.setInstrumentos(guardadas);
             }
@@ -157,7 +157,6 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
         }
         //Parsing userInfo
-        info.setSession(session);
         info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
         //returning response
         return info;

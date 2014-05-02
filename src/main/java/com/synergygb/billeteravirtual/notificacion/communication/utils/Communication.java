@@ -21,6 +21,8 @@ package com.synergygb.billeteravirtual.notificacion.communication.utils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.notificacion.communication.*;
+import com.synergygb.billeteravirtual.notificacion.models.Card;
+import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunicationType;
@@ -70,5 +72,12 @@ public class Communication {
         loginResult = (UserInfo) response.toObject(UserInfo.class);
 
         return loginResult;
+    }
+    
+    public static Card postInstrumentData(DataLayerCommunicationType ct, InstrumentParamsModel instrumentModel, String ci, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
+        InstrumentPOSTCommunication postLoginCommunication = new InstrumentPOSTCommunication(ci,cacheConnector);
+        LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);   
+        return (Card) response.toObject(UserInfo.class);
     }
 }

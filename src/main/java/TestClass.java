@@ -29,13 +29,18 @@ public class TestClass {
 
     private static final int EXP_TIME = 0;
     private static final String KEY = "card-";
-    private final String cedulas[] = {"18839634", "19000000", "15000000"};
-    private final String prov[] = {"Master Card", "American Express", "Visa", "Maestro", "Dinner Club"};
-    private final String ref[] = {"egw28hol0uzoa3dqsfd1nxc9gylvyr","4l3jnnb4m4tso0ugg7y49ecd09956f","5e8f05cxujszzvlxa0egvueahtevp0","vabcdd2egf0jn36cjj1ima5w9gkpt2","dh9olmopd2fpfzo2uuiwbo1vsnt2bo","098sz29z75bh2gg46ddi7v8eewhhd9","1ppuowzk97jv2fm7rh20g9zptqwzkx","ii827ohur9lwu2u5q9n0jyrvzq9rqs","vz5lr484x79kuwx8gbvbv0gwxz20w3"};
-    private StringBuilder sb;
+    private String cedulas[] = {"18839634", "19000000", "15000000"};
+    private String prov[] = {"Master Card", "American Express", "Visa", "Maestro", "Dinner Club"};
+    private String id[] = {"djvmogsm","n7lhs4qy","sn7250lm","aiskc3zl","7p4o7d10","6g2k9xlm","9h7zshs5","shn58544","0y53r3c7"};
+    private String ref[] = {"vdhbi073que380zzqvp36ikazxwb1t","m0ai9s5c3kdzsxp0ns9mz4ea4ruelh","10u8dx701a7ydl7ihsodg8onnmso55","6prwg5gm41yex13mg4tl5voy5w71bc","3aypulbu4k3kasekfqnaow8hsga34m","m7ul28k3uhrig2lkkvnnj4voxmbgst","4yxgpbolje8jpv3dtbp6rert9xkgm5","ok55nk0w5n0oa366vg33pzdfb95kuf","3fc53zstqmz1xeria6cef1zrvg2iww"};
     private Random aleatorio;
 
     public TestClass() {
+        String temporal = "1234 5678 90123 4567";
+        System.out.println("Ultimos 4 digitos: "+temporal.substring(temporal.length()-4, temporal.length()));
+    }
+
+    public TestClass(boolean sobrecargado) {
         CouchbaseClient client = null;
         aleatorio = new Random();
         System.setProperty("viewmode", "development");
@@ -49,7 +54,7 @@ public class TestClass {
             client = new CouchbaseClient(serverList, "billetera", "");
             //------- Llenando la bd -----
             //borradoInstrumentos(client);
-            llenadoRef(client);
+            //llenadoRef(client);
             //------- listar bd -----------
             listado(client,false);
             //------- Creacion de vistas -------
@@ -61,7 +66,7 @@ public class TestClass {
             Logger.getLogger(TestClass.class.getName()).log(Level.SEVERE, "Problemas con el cableado de la bd", ex);
         }
     }
-
+    
     private void borradoInstrumentos(CouchbaseClient client) {
         for (String apuntador : this.ref) {
             try {
@@ -80,7 +85,7 @@ public class TestClass {
 
     private void llenadoInstrumentos(CouchbaseClient client) {
         for (String cedula : cedulas) {
-            Instrument[] tarj = new Instrument[1 + aleatorio.nextInt(3)];
+            Instrument[] tarj = new Instrument[3];
             for (int i = 0; i < tarj.length; i++) {
                 tarj[i] = new Instrument(generaCadena(8), generaCadena(30));
             }
@@ -90,7 +95,7 @@ public class TestClass {
 
     private String generaCadena(int longitud) {
         char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-        sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < longitud; i++) {
             sb.append(chars[random.nextInt(chars.length)]);
@@ -106,8 +111,10 @@ public class TestClass {
     }
 
     private void llenadoRef(CouchbaseClient client) {
+        int i = 0;
         for (String apuntador : this.ref) {
-            client.set(KEY + apuntador, EXP_TIME, new Card(String.valueOf(5000 + aleatorio.nextInt(5000)), prov[aleatorio.nextInt(prov.length)]));
+            client.set(KEY + apuntador, EXP_TIME, new Card(String.valueOf(5000 + aleatorio.nextInt(5000)), prov[aleatorio.nextInt(prov.length)], id[i], "1" ));
+            i++;
             //client.set(KEY + cedula, EXP_TIME, new Wallet());
         }
     }

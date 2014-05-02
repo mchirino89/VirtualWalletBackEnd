@@ -17,13 +17,33 @@ public class Card implements Serializable {
 
     private String ultDigito;
     private String proveedor;
+    private String id;
+    private String activa;
+
+    public String getActiva() {
+        return activa;
+    }
+
+    public void setActiva(String activa) {
+        this.activa = activa;
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public Card() {
     }
 
-    public Card(String ultDigito, String proveedor) {
+    public Card(String ultDigito, String proveedor, String id, String activa) {
         this.ultDigito = ultDigito;
         this.proveedor = proveedor;
+        this.id = id;
+        this.activa = activa;
     }
     
     public String getUltDigito() {
@@ -44,7 +64,7 @@ public class Card implements Serializable {
     
     @Override
     public String toString(){
-        return "{\"proveedor\": \""+this.proveedor+"\", \"ultDig\": \""+this.ultDigito+"\"}";
+        return "{\"proveedor\": \""+this.proveedor+"\", \"ultDig\": \""+this.ultDigito+", \"id\": \""+this.id+", \"activa\": \""+this.activa+"\"};";
     }
     
 }
