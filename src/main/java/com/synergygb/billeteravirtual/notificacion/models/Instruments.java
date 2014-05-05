@@ -4,6 +4,7 @@ package com.synergygb.billeteravirtual.notificacion.models;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /*
@@ -18,20 +19,20 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class Instruments implements Serializable{
-    private Instrument[] tarjetas;
+    private ArrayList<Instrument> tarjetas;
 
     public Instruments() {
     }
 
-    public Instruments(Instrument[] tarjetas) {
+    public Instruments(ArrayList<Instrument> tarjetas) {
         this.tarjetas = tarjetas;
     }
 
-    public Instrument[] getTarjetas() {
+    public ArrayList<Instrument> getTarjetas() {
         return tarjetas;
     }
 
-    public void setTarjetas(Instrument[] tarjetas) {
+    public void setTarjetas(ArrayList<Instrument> tarjetas) {
         this.tarjetas = tarjetas;
     }
     

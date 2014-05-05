@@ -52,9 +52,9 @@ public class Communication {
         logger.addAppender(conappender);
     }
 
-    public static UserInfo postLoginData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+    public static UserInfo postLoginData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
-        LoginPOSTCommunication postLoginCommunication = new LoginPOSTCommunication(cacheConnector);
+        LoginPOSTCommunication postLoginCommunication = new LoginPOSTCommunication(cacheConnector,cookie);
 
         UserInfo loginResult;
         LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);
@@ -78,6 +78,6 @@ public class Communication {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
         InstrumentPOSTCommunication postLoginCommunication = new InstrumentPOSTCommunication(ci,cacheConnector);
         LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);   
-        return (Card) response.toObject(UserInfo.class);
+        return (Card) response.toObject(Card.class);
     }
 }

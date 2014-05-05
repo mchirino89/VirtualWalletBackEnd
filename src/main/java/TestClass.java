@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 public class TestClass {
 
     private static final int EXP_TIME = 0;
-    private static final String KEY = "card-";
+    private static final String KEY = "instruments-";
     private String cedulas[] = {"18839634", "19000000", "15000000"};
     private String prov[] = {"Master Card", "American Express", "Visa", "Maestro", "Dinner Club"};
     private String id[] = {"djvmogsm","n7lhs4qy","sn7250lm","aiskc3zl","7p4o7d10","6g2k9xlm","9h7zshs5","shn58544","0y53r3c7"};
@@ -54,9 +54,9 @@ public class TestClass {
             client = new CouchbaseClient(serverList, "billetera", "");
             //------- Llenando la bd -----
             //borradoInstrumentos(client);
-            //llenadoRef(client);
+            //llenadoInstrumentos(client);
             //------- listar bd -----------
-            listado(client,false);
+            listado(client,true);
             //------- Creacion de vistas -------
             //creacionDeVista(client);
             client.shutdown();
@@ -68,7 +68,7 @@ public class TestClass {
     }
     
     private void borradoInstrumentos(CouchbaseClient client) {
-        for (String apuntador : this.ref) {
+        for (String apuntador : this.cedulas) {
             try {
                 System.out.println("exito: " + client.delete(KEY + apuntador).get());
             } catch (InterruptedException ex) {
@@ -84,10 +84,11 @@ public class TestClass {
     }
 
     private void llenadoInstrumentos(CouchbaseClient client) {
+        int k = 0;
         for (String cedula : cedulas) {
-            Instrument[] tarj = new Instrument[3];
-            for (int i = 0; i < tarj.length; i++) {
-                tarj[i] = new Instrument(generaCadena(8), generaCadena(30));
+            ArrayList<Instrument> tarj = new ArrayList<Instrument>();
+            for (int i = 0; i < 3; i++, k++) {
+                tarj.add(new Instrument(id[k], ref[k]));
             }
             client.set(KEY + cedula, EXP_TIME, new Instruments(tarj));
         }
@@ -155,6 +156,6 @@ public class TestClass {
     }
 
     public static void main(String[] args) {
-        new TestClass();
+        new TestClass(true);
     }
 }

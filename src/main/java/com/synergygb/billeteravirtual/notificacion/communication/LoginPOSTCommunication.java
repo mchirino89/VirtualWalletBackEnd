@@ -58,11 +58,13 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     private static final Logger logger = Logger.getLogger(LoginPOSTCommunication.class);
     private GenericMemcachedConnector cacheConnector;
     private User respuesta;
+    private String cookie;
     WSLog wsLog = new WSLog("Communcation Login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
-    public LoginPOSTCommunication(GenericMemcachedConnector cacheConnector) {
+    public LoginPOSTCommunication(GenericMemcachedConnector cacheConnector,String cookie) {
         this.cacheConnector = cacheConnector;
+        this.cookie = cookie;
         logger.addAppender(conappender);
     }
 
@@ -80,6 +82,9 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         //---------------------------------------------------------------------
         try {
             loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
+            if(checkOTP(loginModel.getOtp())){
+                throw new AuthenticationException("Problemas con la OTP generada por este dispositivo");
+            }
             if (!initInput(loginModel)) {
                 throw new NonExistingUser("Usuario incorrecto");
             }
@@ -152,6 +157,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
                         guardadas.add(auxiliar);
                 }
                 info.setInstrumentos(guardadas);
+                cacheConnector.save(GenericParams.SESSION, new Session(loginModel.getCi()), "7ebfd2833fe4c2178851b4c5364eb2a5");
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
@@ -160,5 +166,12 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
         //returning response
         return info;
+    }
+    
+    //------ Autenticación de código OTP -------
+    private boolean checkOTP(String otp)
+    {
+        //Aqui falta la validación del código con el método de Gemalto
+        return otp.isEmpty() || otp.length() == 0;
     }
 }

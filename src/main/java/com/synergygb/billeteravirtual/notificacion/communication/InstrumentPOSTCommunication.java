@@ -56,7 +56,7 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
     private GenericMemcachedConnector cacheConnector;
     WSLog wsLog = new WSLog("Communcation Login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private String ci;
+    private String ci, CardRef;
 
     public InstrumentPOSTCommunication(String ci, GenericMemcachedConnector cacheConnector) {
         this.ci = ci;
@@ -83,7 +83,7 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
             throw new LayerCommunicationException();
         }
         //Parsing response
-        info = initLoginInfo(instrumentModel);
+        info = initAddInstInfo(instrumentModel);
         try {
             ldoResponse = LayerDataObject.buildFromObject(info);
         } catch (LayerDataObjectParseException ex) {
@@ -97,44 +97,50 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
     private void initInput(InstrumentParamsModel instrumentModel) {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Generando referencia en la BD para la tarjeta número " + instrumentModel.getCardNumber()));
         String CardId = generaCadena(GenericParams.RANDOM_CARD_ID);
-        String CardRef = generaCadena(GenericParams.RANDOM_CARD_REF);
+        CardRef = generaCadena(GenericParams.RANDOM_CARD_REF);
         try {
             String proveedor = "";
-            switch (Integer.parseInt(String.valueOf(instrumentModel.getCardNumber().charAt(0)))) {
-                case 4:
-                    proveedor = "Visa";
-                    break;
-                case 5:
-                    proveedor = "Master Card";
-                    break;
-                case 3:
-                    proveedor = "American Express";
-                    break;
-                default:
-                    proveedor = "Dinner Club";
-                    break;
-
+            Session validez = (Session) cacheConnector.get(GenericParams.SESSION, instrumentModel.getCookie());
+            if (validez != null) {
+                switch (Integer.parseInt(String.valueOf(instrumentModel.getCardNumber().charAt(0)))) {
+                    case 4:
+                        proveedor = "Visa";
+                        break;
+                    case 5:
+                        proveedor = "Master Card";
+                        break;
+                    case 3:
+                        proveedor = "American Express";
+                        break;
+                    default:
+                        proveedor = "Dinner Club";
+                        break;
+                }
+                cacheConnector.save(GenericParams.CARD,
+                        new Card(instrumentModel.getCardNumber().substring(instrumentModel.getCardNumber().length() - 4, instrumentModel.getCardNumber().length()),
+                                proveedor, CardId, GenericParams.ACTIVICE_CARD), CardRef);
+                Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, this.ci);
+                registradas.getTarjetas().add(new Instrument(CardId, CardRef));
+                cacheConnector.save(GenericParams.INSTRUMENTS, registradas, this.ci);
             }
-            cacheConnector.save(GenericParams.CARD,
-                    new Card(instrumentModel.getCardHolderName().substring(instrumentModel.getCardHolderName().length() - 4, instrumentModel.getCardHolderName().length()),
-                            proveedor, CardId, "1"), CardRef);
-            
+            else{
+                System.out.println("cookie invalida");
+            }
+
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo cotejar la tarjeta con el número " + instrumentModel.getCardHolderName()));
-
         }
     }
 
     //------ Respuesta ---------
-    private Card initLoginInfo(InstrumentParamsModel instrumentModel) {
-        Card info = new Card();
+    private Card initAddInstInfo(InstrumentParamsModel instrumentModel) {
+        Card info = null;
         //Getting card's info
         try {
-            Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, instrumentModel.getCardNumber());
-            if (registradas == null) {
-                System.out.println("Usuario sin intrumentos registrados");
-                
-            } 
+            info = (Card) cacheConnector.get(GenericParams.CARD, CardRef);
+            if (info == null) {
+                throw new InstantiationError("Instrumento no registrado correctamente");
+            }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el instrumento de con el numero de tarjeta: " + instrumentModel.getCardNumber()));
         }

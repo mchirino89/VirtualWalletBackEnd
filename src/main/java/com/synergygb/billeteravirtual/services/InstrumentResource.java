@@ -50,7 +50,7 @@ public class InstrumentResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{ci}/instruments/instrument")
+    @Path("/{ci}/instruments/instrument/")
     public Response addInstrument(String content,@PathParam("ci") String userId) {
         WebServiceStatus status = null;
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;

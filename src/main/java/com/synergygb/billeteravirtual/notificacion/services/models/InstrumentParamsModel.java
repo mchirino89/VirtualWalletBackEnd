@@ -31,26 +31,36 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class InstrumentParamsModel implements Serializable {
 
     private String cardHolderName;
+    private String cardExpirationDate;
     private String cardNumber;
     private String cardCVV;
-    private String cardExpirationDate;
-    
+    private String cookie;
+
     public InstrumentParamsModel() {
     }
 
-    public InstrumentParamsModel(String cardHolderName, String cardNumber, String cardCVV, String cardExpirationDate) {
+    public InstrumentParamsModel(String cardHolderName, String cardExpirationDate, String cardNumber, String cardCVV, String cookie) {
         this.cardHolderName = cardHolderName;
+        this.cardExpirationDate = cardExpirationDate;
         this.cardNumber = cardNumber;
         this.cardCVV = cardCVV;
-        this.cardExpirationDate = cardExpirationDate;
+        this.cookie = cookie;
     }
-    
+
     public String getCardHolderName() {
         return cardHolderName;
     }
 
     public void setCardHolderName(String cardHolderName) {
         this.cardHolderName = cardHolderName;
+    }
+
+    public String getCardExpirationDate() {
+        return cardExpirationDate;
+    }
+
+    public void setCardExpirationDate(String cardExpirationDate) {
+        this.cardExpirationDate = cardExpirationDate;
     }
 
     public String getCardNumber() {
@@ -69,13 +79,13 @@ public class InstrumentParamsModel implements Serializable {
         this.cardCVV = cardCVV;
     }
 
-    public String getCardExpirationDate() {
-        return cardExpirationDate;
+    public String getCookie() {
+        return cookie;
     }
 
-    public void setCardExpirationDate(String cardExpirationDate) {
-        this.cardExpirationDate = cardExpirationDate;
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
     }
-    
+
     
 }

@@ -33,10 +33,15 @@ public class LoginParamsModel implements Serializable {
     public LoginParamsModel() {
     }
 
-    public LoginParamsModel(String ci, String pass) {
+    public LoginParamsModel(String ci, String pass, String otp) {
         this.ci = ci;
         this.pass = pass;
+        this.otp = otp;
     }
+    /**
+     * User otp 
+     */
+    private String otp;
     /**
      * Document number
      */
@@ -68,6 +73,14 @@ public class LoginParamsModel implements Serializable {
      */
     public void setCi(String ci) {
         this.ci = ci;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
     public String toString(){
         return "{\"ci\": \""+this.ci+", \"pass\":\""+this.pass+"}";

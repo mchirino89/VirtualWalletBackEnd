@@ -61,7 +61,6 @@ public class sessionPOSTHandler extends WebServiceHandler {
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType;
         LoginParamsModel loginModel = null;
-        long totalServiceTime = new Date().getTime();
         //-----------------------------------------------------
         // Declaring connector 
         //-----------------------------------------------------
@@ -94,7 +93,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         UserInfo responseLogin = null;
         try {
             cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
-            responseLogin = Communication.postLoginData(communicationType, loginModel, cacheConnector);
+            responseLogin = Communication.postLoginData(communicationType, loginModel, cookie, cacheConnector);
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.AUTHENTICATION_ERROR);
