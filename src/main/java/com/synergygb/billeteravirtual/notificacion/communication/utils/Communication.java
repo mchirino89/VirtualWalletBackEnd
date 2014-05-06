@@ -55,7 +55,6 @@ public class Communication {
     public static UserInfo postLoginData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
         LoginPOSTCommunication postLoginCommunication = new LoginPOSTCommunication(cacheConnector,cookie);
-
         UserInfo loginResult;
         LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);
         loginResult = (UserInfo) response.toObject(UserInfo.class);
@@ -65,10 +64,10 @@ public class Communication {
     
     public static UserInfo postRegistrationData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
-        RegistrationPOSTCommunication postLoginCommunication = new RegistrationPOSTCommunication(cacheConnector);
+        RegistrationPOSTCommunication postRegistrationCommunication = new RegistrationPOSTCommunication(cacheConnector);
 
         UserInfo loginResult;
-        LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);
+        LayerDataObject response = postRegistrationCommunication.communicate(ct, loginInputLDO);
         loginResult = (UserInfo) response.toObject(UserInfo.class);
 
         return loginResult;
@@ -76,8 +75,13 @@ public class Communication {
     
     public static Card postInstrumentData(DataLayerCommunicationType ct, InstrumentParamsModel instrumentModel, String ci, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
-        InstrumentPOSTCommunication postLoginCommunication = new InstrumentPOSTCommunication(ci,cacheConnector);
-        LayerDataObject response = postLoginCommunication.communicate(ct, loginInputLDO);   
+        InstrumentPOSTCommunication postInstrumentCommunication = new InstrumentPOSTCommunication(ci,cacheConnector);
+        LayerDataObject response = postInstrumentCommunication.communicate(ct, loginInputLDO);   
         return (Card) response.toObject(Card.class);
+    }
+    
+    public static void deleteInstrumentData(DataLayerCommunicationType ct, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        InstrumentDELETECommunication deleteInstrumentCommunication = new InstrumentDELETECommunication(ci,instrumentId,cookie,cacheConnector);
+        deleteInstrumentCommunication.communicate(ct,LayerDataObject.buildFromObject(new Object()));   
     }
 }

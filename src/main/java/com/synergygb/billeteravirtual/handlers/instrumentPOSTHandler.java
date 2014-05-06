@@ -45,11 +45,12 @@ public class instrumentPOSTHandler extends WebServiceHandler {
     private static final Logger logger = Logger.getLogger(instrumentPOSTHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private int type;
+    private final int type;
     private String ci;
     private String cookie;
     private String instrumentId;
-    public instrumentPOSTHandler(int type, String ci, String cookie,String instrumentId) {
+
+    public instrumentPOSTHandler(int type, String ci, String cookie, String instrumentId) {
         this.type = type;
         this.ci = ci;
         this.cookie = cookie;
@@ -62,7 +63,6 @@ public class instrumentPOSTHandler extends WebServiceHandler {
         //-----------------------------------------------------
         // Declaring parsing variables
         //-----------------------------------------------------
-        String cookie = null;
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType;
         InstrumentParamsModel instrumentModel = null;
@@ -77,7 +77,7 @@ public class instrumentPOSTHandler extends WebServiceHandler {
         LayerDataObject loginLdo = null;
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
-            switch(type){
+            switch (type) {
                 case GenericParams.INSTRUMENT_ADD: // Añadirlo
                     instrumentModel = (InstrumentParamsModel) loginLdo.toObject(InstrumentParamsModel.class);
                     break;
@@ -86,7 +86,7 @@ public class instrumentPOSTHandler extends WebServiceHandler {
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
                     break;
             }
-            
+
         } catch (LayerDataObjectToObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
@@ -106,13 +106,14 @@ public class instrumentPOSTHandler extends WebServiceHandler {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         Card responseCard = null;
         try {
-            switch(type){
+            switch (type) {
                 case GenericParams.INSTRUMENT_ADD: // Añadirlo
                     responseCard = Communication.postInstrumentData(communicationType, instrumentModel, this.ci, cacheConnector);
                     break;
-                case GenericParams.INSTRUMENT_CHECK:// Chequearlo 
+                case GenericParams.INSTRUMENT_CHECK:// Chequearlo
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
+                    
                     break;
             }
         } catch (AuthenticationException ex) {
@@ -130,13 +131,22 @@ public class instrumentPOSTHandler extends WebServiceHandler {
         } catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
-        } 
-        LayerDataObject responseLoginLDO = null;
-        try {
-           responseLoginLDO = LayerDataObject.buildFromObject(responseCard);
-        } catch (LayerDataObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
-            return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
+        }
+        switch (type) {
+            case GenericParams.INSTRUMENT_ADD: // Añadirlo
+                LayerDataObject responseLoginLDO = null;
+                try {
+                    responseLoginLDO = LayerDataObject.buildFromObject(responseCard);
+                } catch (LayerDataObjectParseException ex) {
+                    logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
+                    return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
+                }
+                break;
+            case GenericParams.INSTRUMENT_CHECK:// Chequearlo
+                break;
+            case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
+                
+                break;
         }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }

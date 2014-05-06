@@ -54,7 +54,8 @@ public class TestClass {
             client = new CouchbaseClient(serverList, "billetera", "");
             //------- Llenando la bd -----
             //borradoInstrumentos(client);
-            //llenadoInstrumentos(client);
+            client.delete("instruments-15000000");
+            llenadoInstrumentos(client);
             //------- listar bd -----------
             listado(client,true);
             //------- Creacion de vistas -------
@@ -68,6 +69,7 @@ public class TestClass {
     }
     
     private void borradoInstrumentos(CouchbaseClient client) {
+        
         for (String apuntador : this.cedulas) {
             try {
                 System.out.println("exito: " + client.delete(KEY + apuntador).get());
@@ -79,11 +81,8 @@ public class TestClass {
         }
     }
 
-    private void insertaRegistro(CouchbaseClient client, String cedula) {
-        client.set(KEY + cedula, EXP_TIME, new User("1234"));
-    }
-
     private void llenadoInstrumentos(CouchbaseClient client) {
+        /*
         int k = 0;
         for (String cedula : cedulas) {
             ArrayList<Instrument> tarj = new ArrayList<Instrument>();
@@ -91,7 +90,12 @@ public class TestClass {
                 tarj.add(new Instrument(id[k], ref[k]));
             }
             client.set(KEY + cedula, EXP_TIME, new Instruments(tarj));
-        }
+        }*/
+         ArrayList<Instrument> tarj = new ArrayList<Instrument>();
+            for (int i = 0, k = 6; i < 3; i++, k++) {
+                tarj.add(new Instrument(id[k], ref[k]));
+            }
+            client.set("instruments-15000000", EXP_TIME, new Instruments(tarj));
     }
 
     private String generaCadena(int longitud) {

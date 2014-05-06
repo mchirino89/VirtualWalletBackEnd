@@ -53,55 +53,19 @@ public class InstrumentResource {
     @Path("/{ci}/instruments/instrument/")
     public Response addInstrument(String content,@PathParam("ci") String userId) {
         WebServiceStatus status = null;
-        ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
         // response to be filled through the handler.
         //---------------------------------------------------------------------
-        WebServiceResponse webResponse = WebServiceResponse.buildDefault(mediaType);
+        WebServiceResponse webResponse = WebServiceResponse.buildDefault(ParametersMediaType.APPLICATION_JSON);
         WebServiceRequest webRequest = null;
-
         try {
-            webRequest = WebServiceRequest.build(request, headers, content, mediaType);
+            webRequest = WebServiceRequest.build(request, headers, content, ParametersMediaType.APPLICATION_JSON);
         } catch (InvalidParametersFormatException ex) {
             ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
-            return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), mediaType);
+            return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), ParametersMediaType.APPLICATION_JSON);
         }
-        //---------------------------------------------------------------------
-        // Calling login handler
-        //---------------------------------------------------------------------
-        instrumentPOSTHandler handler = new instrumentPOSTHandler(GenericParams.INSTRUMENT_ADD,userId,null,null);
-        try {
-            status = handler.run(webRequest, webResponse);
-        } catch (Exception e) {
-            // catching any unexpected exception
-            status = WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
-            System.err.println("Excepcion: " + e.getLocalizedMessage());
-            StackTraceElement[] aux = e.getStackTrace();
-            separation(divisor);
-            for (int i = 0; i < aux.length; i++) {
-                System.out.println("Traza nº " + (i + 1));
-                System.out.println("Clase: " + aux[i].getClassName());
-                System.out.println("Metodo: " + aux[i].getMethodName());
-                System.out.println("Linea: " + aux[i].getLineNumber());
-                separation(divisor);
-            }
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
-        }
-        //---------------------------------------------------------------------
-        // Enconding response in UTF-8.
-        //---------------------------------------------------------------------
-        webResponse.setUTF8Encoding(mediaType);
-        //---------------------------------------------------------------------
-        // Returning the appropriate response according to the status
-        //---------------------------------------------------------------------
-        if (status.ok()) {
-            WebServiceHandler.addStatusToWSResponse(webResponse, status, mediaType);
-            return WebServiceHandler.okResponse(webResponse);
-        } else {
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
-        }
-        //return Response.status(Response.Status.CREATED).build();
+        return getResponse(webResponse, webRequest, status, new instrumentPOSTHandler(GenericParams.INSTRUMENT_ADD,userId,null,null));
     }
 
     @GET
@@ -109,49 +73,13 @@ public class InstrumentResource {
     @Path("/{ci}/instruments/instrument/{id}/transactions?cookie={cookie}")
     public Response checkInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
-        ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
         // response to be filled through the handler.
         //---------------------------------------------------------------------
-        WebServiceResponse webResponse = WebServiceResponse.buildDefault(mediaType);
-        WebServiceRequest webRequest = null;
-        webRequest = WebServiceRequest.build(request, headers);
-        //---------------------------------------------------------------------
-        // Calling login handler
-        //---------------------------------------------------------------------
-        instrumentPOSTHandler handler = new instrumentPOSTHandler(GenericParams.INSTRUMENT_CHECK, userId, cookie, instrumentId);
-        try {
-            status = handler.run(webRequest, webResponse);
-        } catch (Exception e) {
-            // catching any unexpected exception
-            status = WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
-            System.err.println("Excepcion: " + e.getLocalizedMessage());
-            StackTraceElement[] aux = e.getStackTrace();
-            separation(divisor);
-            for (int i = 0; i < aux.length; i++) {
-                System.out.println("Traza nº " + (i + 1));
-                System.out.println("Clase: " + aux[i].getClassName());
-                System.out.println("Metodo: " + aux[i].getMethodName());
-                System.out.println("Linea: " + aux[i].getLineNumber());
-                separation(divisor);
-            }
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
-        }
-        //---------------------------------------------------------------------
-        // Enconding response in UTF-8.
-        //---------------------------------------------------------------------
-        webResponse.setUTF8Encoding(mediaType);
-        //---------------------------------------------------------------------
-        // Returning the appropriate response according to the status
-        //---------------------------------------------------------------------
-        if (status.ok()) {
-            WebServiceHandler.addStatusToWSResponse(webResponse, status, mediaType);
-            return WebServiceHandler.okResponse(webResponse);
-        } else {
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
-        }
-        //return Response.status(Response.Status.CREATED).build();
+        WebServiceResponse webResponse = WebServiceResponse.buildDefault(ParametersMediaType.APPLICATION_JSON);
+        WebServiceRequest webRequest = WebServiceRequest.build(request, headers);
+        return getResponse(webResponse, webRequest, status, new instrumentPOSTHandler(GenericParams.INSTRUMENT_CHECK, userId, cookie, instrumentId));
     }
     
     @DELETE
@@ -159,18 +87,17 @@ public class InstrumentResource {
     @Path("/{ci}/instruments/instrument/{id}/transactions?cookie={cookie}")
     public Response deleteInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
-        ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
         // response to be filled through the handler.
         //---------------------------------------------------------------------
-        WebServiceResponse webResponse = WebServiceResponse.buildDefault(mediaType);
-        WebServiceRequest webRequest = null;
-        webRequest = WebServiceRequest.build(request, headers);
+        WebServiceResponse webResponse = WebServiceResponse.buildDefault(ParametersMediaType.APPLICATION_JSON);
+        WebServiceRequest webRequest = WebServiceRequest.build(request, headers);
         //---------------------------------------------------------------------
-        // Calling login handler
-        //---------------------------------------------------------------------
-        instrumentPOSTHandler handler = new instrumentPOSTHandler(GenericParams.INSTRUMENT_REMOVE, userId, cookie, instrumentId);
+        return getResponse(webResponse, webRequest, status, new instrumentPOSTHandler(GenericParams.INSTRUMENT_REMOVE, userId, cookie, instrumentId));
+    }
+    
+    private Response getResponse(WebServiceResponse webResponse,WebServiceRequest webRequest, WebServiceStatus status, WebServiceHandler handler){
         try {
             status = handler.run(webRequest, webResponse);
         } catch (Exception e) {
@@ -186,22 +113,21 @@ public class InstrumentResource {
                 System.out.println("Linea: " + aux[i].getLineNumber());
                 separation(divisor);
             }
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
+            return WebServiceHandler.okResponseFromStatus(status, ParametersMediaType.APPLICATION_JSON);
         }
         //---------------------------------------------------------------------
         // Enconding response in UTF-8.
         //---------------------------------------------------------------------
-        webResponse.setUTF8Encoding(mediaType);
+        webResponse.setUTF8Encoding(ParametersMediaType.APPLICATION_JSON);
         //---------------------------------------------------------------------
         // Returning the appropriate response according to the status
         //---------------------------------------------------------------------
         if (status.ok()) {
-            WebServiceHandler.addStatusToWSResponse(webResponse, status, mediaType);
+            WebServiceHandler.addStatusToWSResponse(webResponse, status, ParametersMediaType.APPLICATION_JSON);
             return WebServiceHandler.okResponse(webResponse);
         } else {
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
+            return WebServiceHandler.okResponseFromStatus(status, ParametersMediaType.APPLICATION_JSON);
         }
-        //return Response.status(Response.Status.CREATED).build();
     }
     
     private void separation(int limit) {

@@ -18,7 +18,6 @@
  */
 package com.synergygb.billeteravirtual.notificacion.communication;
 
-import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
@@ -36,7 +35,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
-import java.util.ArrayList;
 import java.util.Random;
 
 /**

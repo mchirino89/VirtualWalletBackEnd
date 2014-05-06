@@ -24,5 +24,5 @@ public class GenericParams {
     public static final int RANDOM_CARD_REF = 30;
     public static final int RANDOM_CARD_ID = 8;
     public static final String ACTIVICE_CARD = "1";
-    public static final String UNACTIVICE_CARD = "0";
+    public static final String DISABLE_CARD = "0";
 }
