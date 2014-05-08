@@ -119,6 +119,7 @@ public class sessionPOSTHandler extends WebServiceHandler {
         }
         response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
         response.addProperty(GenericParams.USER_COOKIE, cookie);
+        System.out.println("Cookie generada para esta sesion: "+cookie);
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
 }

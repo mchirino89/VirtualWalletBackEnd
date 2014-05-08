@@ -35,6 +35,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -114,11 +115,17 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
                         proveedor = "Dinner Club";
                         break;
                 }
+                
                 cacheConnector.save(GenericParams.CARD,
                         new Card(instrumentModel.getCardNumber().substring(instrumentModel.getCardNumber().length() - 4, instrumentModel.getCardNumber().length()),
                                 proveedor, CardId, GenericParams.ACTIVICE_CARD), CardRef);
+                System.out.println("Consulta de instrumentos para agregar: "+GenericParams.INSTRUMENTS + this.ci);
                 Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, this.ci);
-                registradas.getTarjetas().add(new Instrument(CardId, CardRef));
+                System.out.println("Intrumentos para dicho usuario en este momento: ");
+                System.out.println(registradas.toString());
+                ArrayList<Instrument> tarjetas = registradas.getTarjetas();
+                tarjetas.add(new Instrument(CardId, CardRef));
+                registradas.setTarjetas(tarjetas);
                 cacheConnector.save(GenericParams.INSTRUMENTS, registradas, this.ci);
             }
             else{
