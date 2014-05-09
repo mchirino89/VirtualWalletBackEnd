@@ -91,6 +91,8 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
                     if (auxiliar.getId().equals(instrumentId))// Cotejando tarjeta a desactivar
                     {
                         auxiliar.setActiva(GenericParams.DISABLE_CARD);
+                        System.out.println(auxiliar);
+                        cacheConnector.save(GenericParams.CARD, auxiliar, tmp.getExternalId());
                         break;
                     }
                 }
@@ -100,7 +102,7 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
                  throw new AuthenticationException("Sesion invalida. Por favor autentíquese e intente de nuevo");
             }
         } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar desactivar el instrumento con el id: " + instrumentId));
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo desactivar el instrumento con el id: " + instrumentId));
         }
         return false;
     }

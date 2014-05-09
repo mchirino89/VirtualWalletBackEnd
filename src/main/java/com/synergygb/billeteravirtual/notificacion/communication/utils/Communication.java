@@ -48,6 +48,10 @@ public class Communication {
     private static WSLog wsLog = new WSLog("Communication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
+    public static Card deleteInstrumentData(DataLayerCommunicationType communicationType, InstrumentParamsModel instrumentModel, String ci, GenericMemcachedConnector cacheConnector) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public Communication() {
         logger.addAppender(conappender);
     }
@@ -82,6 +86,6 @@ public class Communication {
     
     public static void deleteInstrumentData(DataLayerCommunicationType ct, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         InstrumentDELETECommunication deleteInstrumentCommunication = new InstrumentDELETECommunication(ci,instrumentId,cookie,cacheConnector);
-        deleteInstrumentCommunication.communicate(ct,LayerDataObject.buildFromObject(new Object()));   
+        deleteInstrumentCommunication.communicate(ct,LayerDataObject.buildFromObject(null));   
     }
 }

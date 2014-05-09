@@ -40,9 +40,9 @@ import org.apache.log4j.PatternLayout;
  *
  *  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  */
-public class instrumentPOSTHandler extends WebServiceHandler {
+public class instrumentHandler extends WebServiceHandler {
 
-    private static final Logger logger = Logger.getLogger(instrumentPOSTHandler.class);
+    private static final Logger logger = Logger.getLogger(instrumentHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
     private final int type;
@@ -50,7 +50,7 @@ public class instrumentPOSTHandler extends WebServiceHandler {
     private String cookie;
     private String instrumentId;
 
-    public instrumentPOSTHandler(int type, String ci, String cookie, String instrumentId) {
+    public instrumentHandler(int type, String ci, String instrumentId, String cookie) {
         this.type = type;
         this.ci = ci;
         this.cookie = cookie;
@@ -113,7 +113,7 @@ public class instrumentPOSTHandler extends WebServiceHandler {
                 case GenericParams.INSTRUMENT_CHECK:// Chequearlo
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
-                    
+                    Communication.deleteInstrumentData(communicationType, this.ci, this.instrumentId, this.cookie, cacheConnector);
                     break;
             }
         } catch (AuthenticationException ex) {
@@ -137,6 +137,7 @@ public class instrumentPOSTHandler extends WebServiceHandler {
                 LayerDataObject responseLoginLDO = null;
                 try {
                     responseLoginLDO = LayerDataObject.buildFromObject(responseCard);
+                    response.addParamFromLDO(GenericParams.CARD_RESPONSE, responseLoginLDO);
                 } catch (LayerDataObjectParseException ex) {
                     logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
                     return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
@@ -144,8 +145,7 @@ public class instrumentPOSTHandler extends WebServiceHandler {
                 break;
             case GenericParams.INSTRUMENT_CHECK:// Chequearlo
                 break;
-            case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
-                
+            case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo   
                 break;
         }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);

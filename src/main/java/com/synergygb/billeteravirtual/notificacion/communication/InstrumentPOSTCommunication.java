@@ -119,17 +119,14 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
                 cacheConnector.save(GenericParams.CARD,
                         new Card(instrumentModel.getCardNumber().substring(instrumentModel.getCardNumber().length() - 4, instrumentModel.getCardNumber().length()),
                                 proveedor, CardId, GenericParams.ACTIVICE_CARD), CardRef);
-                System.out.println("Consulta de instrumentos para agregar: "+GenericParams.INSTRUMENTS + this.ci);
                 Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, this.ci);
-                System.out.println("Intrumentos para dicho usuario en este momento: ");
-                System.out.println(registradas.toString());
                 ArrayList<Instrument> tarjetas = registradas.getTarjetas();
                 tarjetas.add(new Instrument(CardId, CardRef));
                 registradas.setTarjetas(tarjetas);
                 cacheConnector.save(GenericParams.INSTRUMENTS, registradas, this.ci);
             }
             else{
-                System.out.println("cookie invalida");
+                throw new SecurityException("cookie invalida");
             }
 
         } catch (CouchbaseOperationException ex) {

@@ -1,7 +1,7 @@
 package com.synergygb.billeteravirtual.services;
 
 import com.synergygb.billeteravirtual.core.ServiceUtils;
-import com.synergygb.billeteravirtual.handlers.instrumentPOSTHandler;
+import com.synergygb.billeteravirtual.handlers.instrumentHandler;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
 import com.synergygb.webAPI.handlers.WebServiceStatus;
@@ -65,7 +65,7 @@ public class InstrumentResource {
             ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
             return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), ParametersMediaType.APPLICATION_JSON);
         }
-        return getResponse(webResponse, webRequest, status, new instrumentPOSTHandler(GenericParams.INSTRUMENT_ADD,userId,null,null));
+        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_ADD,userId,null,null));
     }
 
     @GET
@@ -79,12 +79,12 @@ public class InstrumentResource {
         //---------------------------------------------------------------------
         WebServiceResponse webResponse = WebServiceResponse.buildDefault(ParametersMediaType.APPLICATION_JSON);
         WebServiceRequest webRequest = WebServiceRequest.build(request, headers);
-        return getResponse(webResponse, webRequest, status, new instrumentPOSTHandler(GenericParams.INSTRUMENT_CHECK, userId, cookie, instrumentId));
+        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_CHECK, userId, cookie, instrumentId));
     }
     
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{ci}/instruments/instrument/{id}/transactions?cookie={cookie}")
+    @Path("/{ci}/instruments/instrument/{id}?cookie={cookie}")
     public Response deleteInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------
@@ -94,7 +94,7 @@ public class InstrumentResource {
         WebServiceResponse webResponse = WebServiceResponse.buildDefault(ParametersMediaType.APPLICATION_JSON);
         WebServiceRequest webRequest = WebServiceRequest.build(request, headers);
         //---------------------------------------------------------------------
-        return getResponse(webResponse, webRequest, status, new instrumentPOSTHandler(GenericParams.INSTRUMENT_REMOVE, userId, cookie, instrumentId));
+        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_REMOVE, userId, instrumentId, cookie));
     }
     
     private Response getResponse(WebServiceResponse webResponse,WebServiceRequest webRequest, WebServiceStatus status, WebServiceHandler handler){
