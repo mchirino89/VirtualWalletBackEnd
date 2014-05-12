@@ -23,22 +23,16 @@ import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunication;
 import com.synergygb.webAPI.layerCommunication.LayerDataObject;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
-import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
-import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
-import com.synergygb.webAPI.layerCommunication.dummies.DummyGenerator;
-import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -72,7 +66,8 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
         LayerDataObject ldoResponse;
         //Parsing response
         try {
-            ldoResponse = LayerDataObject.buildFromObject(disableCard());
+            disableCard();
+            ldoResponse = LayerDataObject.buildFromObject("");
         } catch (LayerDataObjectParseException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error obteniendo el LDO durante la desactivacion "), ex);
             throw new LayerCommunicationException();
@@ -81,7 +76,7 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
     }
     
     //------ Respuesta ---------
-    private boolean disableCard() throws AuthenticationException {
+    private void disableCard() throws AuthenticationException {
         //Getting card's info
         try {
             if ((Session) cacheConnector.get(GenericParams.SESSION, this.cookie) != null) {
@@ -96,7 +91,6 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
                         break;
                     }
                 }
-                return true;
             }
             else{
                  throw new AuthenticationException("Sesion invalida. Por favor autentíquese e intente de nuevo");
@@ -104,6 +98,5 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo desactivar el instrumento con el id: " + instrumentId));
         }
-        return false;
     }
 }

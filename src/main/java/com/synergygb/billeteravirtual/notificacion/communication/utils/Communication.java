@@ -84,8 +84,10 @@ public class Communication {
         return (Card) response.toObject(Card.class);
     }
     
-    public static void deleteInstrumentData(DataLayerCommunicationType ct, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+    public static void deleteInstrumentData(DataLayerCommunicationType ct, InstrumentParamsModel instrumentModel, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
         InstrumentDELETECommunication deleteInstrumentCommunication = new InstrumentDELETECommunication(ci,instrumentId,cookie,cacheConnector);
-        deleteInstrumentCommunication.communicate(ct,LayerDataObject.buildFromObject(null));   
+        deleteInstrumentCommunication.communicate(ct,loginInputLDO);
+        return;
     }
 }

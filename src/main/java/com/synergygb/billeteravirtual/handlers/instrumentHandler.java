@@ -64,7 +64,7 @@ public class instrumentHandler extends WebServiceHandler {
         // Declaring parsing variables
         //-----------------------------------------------------
         WebServiceParameters params = request.getRequestBody();
-        DataLayerCommunicationType communicationType;
+        DataLayerCommunicationType communicationType = null;
         InstrumentParamsModel instrumentModel = null;
         //-----------------------------------------------------
         // Declaring connector 
@@ -77,9 +77,10 @@ public class instrumentHandler extends WebServiceHandler {
         LayerDataObject loginLdo = null;
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
+            instrumentModel = (InstrumentParamsModel) loginLdo.toObject(InstrumentParamsModel.class);
             switch (type) {
                 case GenericParams.INSTRUMENT_ADD: // Añadirlo
-                    instrumentModel = (InstrumentParamsModel) loginLdo.toObject(InstrumentParamsModel.class);
+                    
                     break;
                 case GenericParams.INSTRUMENT_CHECK:// Chequearlo 
                     break;
@@ -113,7 +114,7 @@ public class instrumentHandler extends WebServiceHandler {
                 case GenericParams.INSTRUMENT_CHECK:// Chequearlo
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
-                    Communication.deleteInstrumentData(communicationType, this.ci, this.instrumentId, this.cookie, cacheConnector);
+                    Communication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
                     break;
             }
         } catch (AuthenticationException ex) {
@@ -144,9 +145,9 @@ public class instrumentHandler extends WebServiceHandler {
                 }
                 break;
             case GenericParams.INSTRUMENT_CHECK:// Chequearlo
-                break;
+                return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
             case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo   
-                break;
+                return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
         }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
