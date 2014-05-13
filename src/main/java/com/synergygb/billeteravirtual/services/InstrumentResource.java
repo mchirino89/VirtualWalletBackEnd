@@ -70,7 +70,7 @@ public class InstrumentResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{ci}/instruments/instrument/{id}/transactions?cookie={cookie}")
+    @Path("/{ci}/instruments/instrument/{id}/transactions/{cookie}")
     public Response checkInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------

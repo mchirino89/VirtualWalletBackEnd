@@ -54,7 +54,6 @@ public class TestClass {
             client = new CouchbaseClient(serverList, "billetera", "");
             //------- Llenando la bd -----
             //borradoInstrumentos(client);
-            client.delete("instruments-15000000");
             llenadoInstrumentos(client);
             //------- listar bd -----------
             listado(client,true);

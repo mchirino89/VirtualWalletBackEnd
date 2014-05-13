@@ -78,16 +78,6 @@ public class instrumentHandler extends WebServiceHandler {
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
             instrumentModel = (InstrumentParamsModel) loginLdo.toObject(InstrumentParamsModel.class);
-            switch (type) {
-                case GenericParams.INSTRUMENT_ADD: // Añadirlo
-                    
-                    break;
-                case GenericParams.INSTRUMENT_CHECK:// Chequearlo 
-                    break;
-                case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
-                    break;
-            }
-
         } catch (LayerDataObjectToObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
@@ -145,9 +135,8 @@ public class instrumentHandler extends WebServiceHandler {
                 }
                 break;
             case GenericParams.INSTRUMENT_CHECK:// Chequearlo
-                return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
-            case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo   
-                return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
+                
+                break;
         }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }

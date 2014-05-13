@@ -146,9 +146,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
         //Getting card's info
         try {
             Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, loginModel.getCi());
-            System.out.println("Consulta instrumentos logeo: "+GenericParams.INSTRUMENTS + loginModel.getCi());
             if (registradas == null) {
-                System.out.println("Usuario sin intrumentos registrados");
                 info.setInstrumentos(new ArrayList<Card>());
             } else {
                 ArrayList<Card> guardadas = new ArrayList<Card>();
@@ -158,8 +156,8 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
                         guardadas.add(auxiliar);
                 }
                 info.setInstrumentos(guardadas);
-                cacheConnector.save(GenericParams.SESSION, new Session(loginModel.getCi()), this.cookie);
             }
+            cacheConnector.save(GenericParams.SESSION, new Session(loginModel.getCi()), this.cookie);
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
         }

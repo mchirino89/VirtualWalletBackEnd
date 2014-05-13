@@ -115,12 +115,18 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
                         proveedor = "Dinner Club";
                         break;
                 }
-                
+                System.out.println("valida!");
                 cacheConnector.save(GenericParams.CARD,
                         new Card(instrumentModel.getCardNumber().substring(instrumentModel.getCardNumber().length() - 4, instrumentModel.getCardNumber().length()),
                                 proveedor, CardId, GenericParams.ACTIVICE_CARD), CardRef);
                 Instruments registradas = (Instruments) cacheConnector.get(GenericParams.INSTRUMENTS, this.ci);
-                ArrayList<Instrument> tarjetas = registradas.getTarjetas();
+                ArrayList<Instrument> tarjetas;
+                if(registradas != null)
+                    tarjetas = registradas.getTarjetas();
+                else{
+                    registradas = new Instruments();
+                    tarjetas = new ArrayList<Instrument>();
+                }
                 tarjetas.add(new Instrument(CardId, CardRef));
                 registradas.setTarjetas(tarjetas);
                 cacheConnector.save(GenericParams.INSTRUMENTS, registradas, this.ci);
