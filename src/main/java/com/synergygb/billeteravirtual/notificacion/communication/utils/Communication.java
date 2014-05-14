@@ -22,6 +22,7 @@ import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConne
 import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.notificacion.communication.*;
 import com.synergygb.billeteravirtual.notificacion.models.Card;
+import com.synergygb.billeteravirtual.notificacion.models.Transaction;
 import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
@@ -88,6 +89,12 @@ public class Communication {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
         InstrumentDELETECommunication deleteInstrumentCommunication = new InstrumentDELETECommunication(ci,instrumentId,cookie,cacheConnector);
         deleteInstrumentCommunication.communicate(ct,loginInputLDO);
-        return;
+    }
+    
+    public static Transaction getInstrumentData(DataLayerCommunicationType ct, InstrumentParamsModel instrumentModel, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
+        InstrumentGETCommunication getInstrumentCommunication = new InstrumentGETCommunication(ci,instrumentId,cookie,cacheConnector);
+        LayerDataObject response = getInstrumentCommunication.communicate(ct, loginInputLDO);   
+        return (Transaction) response.toObject(Transaction.class);
     }
 }

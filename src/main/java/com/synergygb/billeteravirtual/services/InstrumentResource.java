@@ -78,7 +78,14 @@ public class InstrumentResource {
         // response to be filled through the handler.
         //---------------------------------------------------------------------
         WebServiceResponse webResponse = WebServiceResponse.buildDefault(ParametersMediaType.APPLICATION_JSON);
-        WebServiceRequest webRequest = WebServiceRequest.build(request, headers);
+        WebServiceRequest webRequest = null;
+        try {
+            webRequest = WebServiceRequest.build(request, headers, "{}", ParametersMediaType.APPLICATION_JSON);
+        } catch (InvalidParametersFormatException ex) {
+            ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
+            return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), ParametersMediaType.APPLICATION_JSON);
+        }
+        //---------------------------------------------------------------------
         return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_CHECK, userId, cookie, instrumentId));
     }
     
