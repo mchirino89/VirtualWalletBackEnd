@@ -104,7 +104,7 @@ public class instrumentHandler extends WebServiceHandler {
                     responseCard = Communication.postInstrumentData(communicationType, instrumentModel, this.ci, cacheConnector);
                     break;
                 case GenericParams.INSTRUMENT_CHECK:// Chequearlo
-                    Communication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
+                    Communication.getInstrumentData(communicationType, instrumentModel,this.ci, this.instrumentId, this.cookie, cacheConnector);
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
                     Communication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);

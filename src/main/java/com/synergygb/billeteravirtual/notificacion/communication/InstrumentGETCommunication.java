@@ -19,10 +19,13 @@
 package com.synergygb.billeteravirtual.notificacion.communication;
 
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
+import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.NonExistingUser;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
+import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunication;
@@ -55,9 +58,9 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
     private GenericMemcachedConnector cacheConnector;
     WSLog wsLog = new WSLog("Communcation Login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private String ci, instrumentId, cookie, CardRef;
+    private String instrumentId, cookie, ci;
 
-    public InstrumentGETCommunication(String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) {
+    public InstrumentGETCommunication(String ci,String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) {
         this.ci = ci;
         this.instrumentId = instrumentId;
         this.cookie = cookie;
@@ -72,6 +75,9 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         //------------------------------------------------------------------
         LayerDataObject ldoResponse;
         Transaction info = null;
+        if(!checkCookie()){
+            throw new AuthenticationException("Sesion inválida. Por favor autentíquese e intente de nuevo");
+        }
         //Parsing response
         info = initAddInstInfo();
         try {
@@ -82,18 +88,27 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         }
         return ldoResponse;
     }
+    
+    private boolean checkCookie(){
+        try {
+            Session auxiliar = (Session) cacheConnector.get(GenericParams.SESSION, this.cookie);
+            if (auxiliar.getCi().equals(this.ci)) {
+                return true;
+            }
+        } catch (CouchbaseOperationException ex) {
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
+        }
+        return false;
+    }
 
     //------ Respuesta ---------
     private Transaction initAddInstInfo() {
         Transaction info = null;
-        //Getting card's info
+        //Getting transactions' info
         try {
-            info = (Transaction) cacheConnector.get(GenericParams.CARD, CardRef);
-            if (info == null) {
-                throw new InstantiationError("Instrumento no registrado correctamente");
-            }
+            info = (Transaction) cacheConnector.get(GenericParams.TRANSACTIONS, this.instrumentId);
         } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.CardRef));
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
         }
         return info;
     }

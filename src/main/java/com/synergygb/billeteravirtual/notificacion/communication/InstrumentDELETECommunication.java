@@ -93,7 +93,7 @@ public class InstrumentDELETECommunication extends DataLayerCommunication {
                 }
             }
             else{
-                 throw new AuthenticationException("Sesion invalida. Por favor autentíquese e intente de nuevo");
+                 throw new AuthenticationException("Sesion inválida. Por favor autentíquese e intente de nuevo");
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo desactivar el instrumento con el id: " + instrumentId));
