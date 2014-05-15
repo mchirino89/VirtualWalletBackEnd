@@ -71,6 +71,7 @@ public class InstrumentResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{ci}/instruments/instrument/{id}/transactions/{cookie}")
+    ///15000000/instruments/instrument/shn58544/transactions/cfca6d922b23e910cb4fe4918ca34e05
     public Response checkInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------
@@ -86,7 +87,7 @@ public class InstrumentResource {
             return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), ParametersMediaType.APPLICATION_JSON);
         }
         //---------------------------------------------------------------------
-        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_CHECK, userId, cookie, instrumentId));
+        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_CHECK, userId, instrumentId, cookie));
     }
     
     @DELETE

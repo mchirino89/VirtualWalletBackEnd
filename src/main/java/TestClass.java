@@ -10,6 +10,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -36,9 +37,7 @@ public class TestClass {
     private Random aleatorio;
 
     public TestClass() {
-        for (int i = 0; i < 10; i++) {
-            System.out.println("Fecha: " + generateDate());
-        }
+        
     }
 
     public TestClass(boolean sobrecargado) {
@@ -164,7 +163,7 @@ public class TestClass {
     }
 
     public static void main(String[] args) {
-        new TestClass(true);
+        new TestClass();
 
     }
 }

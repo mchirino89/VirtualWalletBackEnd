@@ -18,6 +18,7 @@ import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.notificacion.models.Card;
 import com.synergygb.billeteravirtual.notificacion.models.Transaction;
+import com.synergygb.billeteravirtual.notificacion.models.Transactions;
 import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
@@ -97,14 +98,14 @@ public class instrumentHandler extends WebServiceHandler {
         //--------------------------------------------------------
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         Card responseCard = null;
-        Transaction responseTransaction = null;
+        Transactions responseTransactions = null;
         try {
             switch (type) {
                 case GenericParams.INSTRUMENT_ADD: // Añadirlo
                     responseCard = Communication.postInstrumentData(communicationType, instrumentModel, this.ci, cacheConnector);
                     break;
                 case GenericParams.INSTRUMENT_CHECK:// Chequearlo
-                    Communication.getInstrumentData(communicationType, instrumentModel,this.ci, this.instrumentId, this.cookie, cacheConnector);
+                    responseTransactions = Communication.getInstrumentData(communicationType, instrumentModel,this.ci, this.instrumentId, this.cookie, cacheConnector);
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
                     Communication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
@@ -139,7 +140,7 @@ public class instrumentHandler extends WebServiceHandler {
                 break;
             case GenericParams.INSTRUMENT_CHECK:// Chequearlo
                 try {
-                    responseLoginLDO = LayerDataObject.buildFromObject(responseTransaction);
+                    responseLoginLDO = LayerDataObject.buildFromObject(responseTransactions);
                     response.addParamFromLDO(GenericParams.TRANSACTIONS_RESPONSE, responseLoginLDO);
                 } catch (LayerDataObjectParseException ex) {
                     logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);

@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
@@ -74,7 +76,7 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         // Declaring parsing variables
         //------------------------------------------------------------------
         LayerDataObject ldoResponse;
-        Transaction info = null;
+        Transactions info = null;
         if(!checkCookie()){
             throw new AuthenticationException("Sesion inválida. Por favor autentíquese e intente de nuevo");
         }
@@ -102,11 +104,17 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
     }
 
     //------ Respuesta ---------
-    private Transaction initAddInstInfo() {
-        Transaction info = null;
+    private Transactions initAddInstInfo() {
+        Transactions info = null;
         //Getting transactions' info
         try {
-            info = (Transaction) cacheConnector.get(GenericParams.TRANSACTIONS, this.instrumentId);
+            info = (Transactions) cacheConnector.get(GenericParams.TRANSACTIONS, this.instrumentId);
+            int index = 0;
+            for(Transaction auxiliar: info.getTarjetas()){
+                //System.out.println("Monto: "+);
+                info.getTarjetas().get(index).setAmount(NumberFormat.getCurrencyInstance().format(Double.parseDouble(auxiliar.getAmount().replace(",", "."))).replaceAll("F.", "F "));
+                index++;
+            }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
         }

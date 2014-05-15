@@ -3,9 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.synergygb.billeteravirtual.notificacion.models;
-
 
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,7 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author mauriciochirino
  */
 @XmlRootElement
-public class Transaction implements Serializable{
+public class Transaction implements Serializable {
+
     private String date, description, amount;
 
     public Transaction() {
@@ -44,16 +43,16 @@ public class Transaction implements Serializable{
     }
 
     public String getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(String amount) {
         this.amount = amount;
     }
-    
+
     @Override
-    public String toString(){
-        return "{\"description\": \""+this.description+"\", \"amount\": \""+this.amount+"\", \"date\": \""+this.date+"\"}";
+    public String toString() {
+        return "{\"description\": \"" + this.description + "\", \"amount\": \"" + this.amount + "\", \"date\": \"" + this.date + "\"}";
     }
-    
+
 }
