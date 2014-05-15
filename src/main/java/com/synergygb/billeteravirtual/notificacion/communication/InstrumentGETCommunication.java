@@ -62,7 +62,7 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
     private String instrumentId, cookie, ci;
 
-    public InstrumentGETCommunication(String ci,String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) {
+    public InstrumentGETCommunication(String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) {
         this.ci = ci;
         this.instrumentId = instrumentId;
         this.cookie = cookie;
@@ -77,7 +77,7 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         //------------------------------------------------------------------
         LayerDataObject ldoResponse;
         Transactions info = null;
-        if(!checkCookie()){
+        if (!checkCookie()) {
             throw new AuthenticationException("Sesion inválida. Por favor autentíquese e intente de nuevo");
         }
         //Parsing response
@@ -90,8 +90,8 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         }
         return ldoResponse;
     }
-    
-    private boolean checkCookie(){
+
+    private boolean checkCookie() {
         try {
             Session auxiliar = (Session) cacheConnector.get(GenericParams.SESSION, this.cookie);
             if (auxiliar.getCi().equals(this.ci)) {
@@ -109,11 +109,16 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         //Getting transactions' info
         try {
             info = (Transactions) cacheConnector.get(GenericParams.TRANSACTIONS, this.instrumentId);
-            int index = 0;
-            for(Transaction auxiliar: info.getTarjetas()){
-                //System.out.println("Monto: "+);
-                info.getTarjetas().get(index).setAmount(NumberFormat.getCurrencyInstance().format(Double.parseDouble(auxiliar.getAmount().replace(",", "."))).replaceAll("F.", "F "));
-                index++;
+            if (info != null) {
+                int index = 0;
+                for (Transaction auxiliar : info.getTarjetas()) {
+                    info.getTarjetas().get(index).setAmount(NumberFormat.getCurrencyInstance().format(Double.parseDouble(auxiliar.getAmount().replace(",", "."))).replaceAll("F.", "F "));
+                    index++;
+                }
+            }
+            else{
+                System.out.println("sin transacciones");
+                info = new Transactions(new ArrayList<Transaction>());
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
