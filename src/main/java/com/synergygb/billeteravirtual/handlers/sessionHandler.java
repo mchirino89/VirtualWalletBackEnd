@@ -42,13 +42,17 @@ import org.apache.log4j.PatternLayout;
  *
  *  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  */
-public class sessionPOSTHandler extends WebServiceHandler {
+public class sessionHandler extends WebServiceHandler {
 
-    private static final Logger logger = Logger.getLogger(sessionPOSTHandler.class);
+    private static final Logger logger = Logger.getLogger(sessionHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
+    private String setCookie;
+    private boolean operation;
 
-    public sessionPOSTHandler() {
+    public sessionHandler(String cookie, boolean operation) {
+        this.setCookie = cookie;
+        this.operation = operation;
         logger.addAppender(conappender);
     }
 
@@ -92,8 +96,12 @@ public class sessionPOSTHandler extends WebServiceHandler {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         UserInfo responseLogin = null;
         try {
-            cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
-            responseLogin = Communication.postLoginData(communicationType, loginModel, cookie, cacheConnector);
+            if (operation) {
+                cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
+                responseLogin = Communication.postLoginData(communicationType, loginModel, cookie, cacheConnector);
+            } else {
+                Communication.putLogoutData(communicationType, loginModel, setCookie, cacheConnector);
+            }
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.AUTHENTICATION_ERROR);
@@ -109,16 +117,18 @@ public class sessionPOSTHandler extends WebServiceHandler {
         } catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
-        } 
-        LayerDataObject responseLoginLDO = null;
-        try {
-           responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
-        } catch (LayerDataObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
-            return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
         }
-        response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
-        response.addProperty(GenericParams.USER_COOKIE, cookie);
+        LayerDataObject responseLoginLDO = null;
+        if (operation) {
+            try {
+                responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
+            } catch (LayerDataObjectParseException ex) {
+                logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
+                return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
+            }
+            response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
+            response.addProperty(GenericParams.USER_COOKIE, cookie);
+        }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }
 }

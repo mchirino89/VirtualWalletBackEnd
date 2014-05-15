@@ -17,7 +17,6 @@ import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.notificacion.models.Card;
-import com.synergygb.billeteravirtual.notificacion.models.Transaction;
 import com.synergygb.billeteravirtual.notificacion.models.Transactions;
 import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.billeteravirtual.params.GenericParams;
