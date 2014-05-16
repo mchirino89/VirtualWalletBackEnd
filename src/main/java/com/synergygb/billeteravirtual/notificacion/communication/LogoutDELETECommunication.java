@@ -43,15 +43,15 @@ import com.synergygb.billeteravirtual.params.GenericParams;
  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  * @version 1.0
  */
-public class LogoutPUTCommunication extends DataLayerCommunication {
+public class LogoutDELETECommunication extends DataLayerCommunication {
 
-    private static final Logger logger = Logger.getLogger(LogoutPUTCommunication.class);
+    private static final Logger logger = Logger.getLogger(LogoutDELETECommunication.class);
     private GenericMemcachedConnector cacheConnector;
     private String cookie;
     WSLog wsLog = new WSLog("Communcation Login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
-    public LogoutPUTCommunication(GenericMemcachedConnector cacheConnector,String cookie) {
+    public LogoutDELETECommunication(GenericMemcachedConnector cacheConnector,String cookie) {
         this.cacheConnector = cacheConnector;
         this.cookie = cookie;
         logger.addAppender(conappender);

@@ -97,14 +97,10 @@ public class instrumentHandler extends WebServiceHandler {
         //--------------------------------------------------------
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         Card responseCard = null;
-        Transactions responseTransactions = null;
         try {
             switch (type) {
                 case GenericParams.INSTRUMENT_ADD: // Añadirlo
                     responseCard = Communication.postInstrumentData(communicationType, instrumentModel, this.ci, cacheConnector);
-                    break;
-                case GenericParams.INSTRUMENT_CHECK:// Chequearlo
-                    responseTransactions = Communication.getInstrumentData(communicationType, instrumentModel,this.ci, this.instrumentId, this.cookie, cacheConnector);
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
                     Communication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
@@ -132,15 +128,6 @@ public class instrumentHandler extends WebServiceHandler {
                 try {
                     responseLoginLDO = LayerDataObject.buildFromObject(responseCard);
                     response.addParamFromLDO(GenericParams.CARD_RESPONSE, responseLoginLDO);
-                } catch (LayerDataObjectParseException ex) {
-                    logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
-                    return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
-                }
-                break;
-            case GenericParams.INSTRUMENT_CHECK:// Chequearlo
-                try {
-                    responseLoginLDO = LayerDataObject.buildFromObject(responseTransactions);
-                    response.addParamFromLDO(GenericParams.TRANSACTIONS_RESPONSE, responseLoginLDO);
                 } catch (LayerDataObjectParseException ex) {
                     logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
                     return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);

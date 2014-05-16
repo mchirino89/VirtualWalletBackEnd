@@ -2,6 +2,7 @@ package com.synergygb.billeteravirtual.services;
 
 import com.synergygb.billeteravirtual.core.ServiceUtils;
 import com.synergygb.billeteravirtual.handlers.instrumentHandler;
+import com.synergygb.billeteravirtual.handlers.transactionHandler;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
 import com.synergygb.webAPI.handlers.WebServiceStatus;
@@ -28,8 +29,8 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author mauriciochirino
  */
-@Path("/wallet")
-public class InstrumentResource {
+@Path("/wallet/{ci}/instruments/instrument/{id}/transactions")
+public class TransactionResource {
 
     private static int divisor = 80;
     @Context
@@ -40,7 +41,7 @@ public class InstrumentResource {
     HttpHeaders headers;
     String id;
 
-    public InstrumentResource(UriInfo uriInfo, Request request, String id, HttpHeaders headers) {
+    public TransactionResource(UriInfo uriInfo, Request request, String id, HttpHeaders headers) {
         this.uriInfo = uriInfo;
         this.request = request;
         this.headers = headers;
@@ -50,8 +51,7 @@ public class InstrumentResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{ci}/instruments/instrument/")
-    public Response addInstrument(String content,@PathParam("ci") String userId) {
+    public Response addInstrument(String content) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
@@ -65,13 +65,13 @@ public class InstrumentResource {
             ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
             return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), ParametersMediaType.APPLICATION_JSON);
         }
-        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_ADD,userId,null,null));
+        return getResponse(webResponse, webRequest, status, new transactionHandler(GenericParams.TRANSACTION_ADD, null, null, null));
     }
-    
-    @DELETE
+
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{ci}/instruments/instrument/{id}/{cookie}")
-    public Response deleteInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
+    @Path("/{cookie}")
+    public Response checkInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
@@ -86,7 +86,7 @@ public class InstrumentResource {
             return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), ParametersMediaType.APPLICATION_JSON);
         }
         //---------------------------------------------------------------------
-        return getResponse(webResponse, webRequest, status, new instrumentHandler(GenericParams.INSTRUMENT_REMOVE, userId, instrumentId, cookie));
+        return getResponse(webResponse, webRequest, status, new transactionHandler(GenericParams.TRANSACTION_CHECK, userId, instrumentId, cookie));
     }
     
     private Response getResponse(WebServiceResponse webResponse,WebServiceRequest webRequest, WebServiceStatus status, WebServiceHandler handler){

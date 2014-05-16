@@ -22,8 +22,9 @@ public class GenericParams {
     public static final String CARD = "card-";
     public static final String SESSION = "session-";
     public static final int INSTRUMENT_ADD = 1;
-    public static final int INSTRUMENT_CHECK = 2;
-    public static final int INSTRUMENT_REMOVE = 3;
+    public static final int INSTRUMENT_REMOVE = 2;
+    public static final boolean TRANSACTION_CHECK = false;
+    public static final boolean TRANSACTION_ADD = true;
     public static final int RANDOM_CARD_REF = 30;
     public static final int RANDOM_CARD_ID = 8;
     public static final String ACTIVICE_CARD = "1";

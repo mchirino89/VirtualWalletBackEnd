@@ -8,9 +8,7 @@ package com.synergygb.billeteravirtual.handlers;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
-import com.synergygb.billeteravirtual.core.utils.CookieUtils;
 import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
-import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
 import com.synergygb.billeteravirtual.core.connector.cache.models.CacheBucketType;
@@ -18,7 +16,9 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
-import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
+import com.synergygb.billeteravirtual.notificacion.models.Card;
+import com.synergygb.billeteravirtual.notificacion.models.Transactions;
+import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
@@ -33,7 +33,6 @@ import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationExce
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
 import com.synergygb.webAPI.parameters.WebServiceParameters;
-import java.util.Date;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -42,17 +41,21 @@ import org.apache.log4j.PatternLayout;
  *
  *  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  */
-public class sessionHandler extends WebServiceHandler {
+public class transactionHandler extends WebServiceHandler {
 
-    private static final Logger logger = Logger.getLogger(sessionHandler.class);
+    private static final Logger logger = Logger.getLogger(transactionHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private String setCookie;
-    private boolean operation;
+    private final boolean type;
+    private String ci;
+    private String cookie;
+    private String instrumentId;
 
-    public sessionHandler(String cookie, boolean operation) {
-        this.setCookie = cookie;
-        this.operation = operation;
+    public transactionHandler(boolean type, String ci, String instrumentId, String cookie) {
+        this.type = type;
+        this.ci = ci;
+        this.cookie = cookie;
+        this.instrumentId = instrumentId;
         logger.addAppender(conappender);
     }
 
@@ -61,10 +64,9 @@ public class sessionHandler extends WebServiceHandler {
         //-----------------------------------------------------
         // Declaring parsing variables
         //-----------------------------------------------------
-        String cookie = null;
         WebServiceParameters params = request.getRequestBody();
-        DataLayerCommunicationType communicationType;
-        LoginParamsModel loginModel = null;
+        DataLayerCommunicationType communicationType = null;
+        InstrumentParamsModel instrumentModel = null;
         //-----------------------------------------------------
         // Declaring connector 
         //-----------------------------------------------------
@@ -76,7 +78,7 @@ public class sessionHandler extends WebServiceHandler {
         LayerDataObject loginLdo = null;
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
-            loginModel = (LoginParamsModel) loginLdo.toObject(LoginParamsModel.class);
+            instrumentModel = (InstrumentParamsModel) loginLdo.toObject(InstrumentParamsModel.class);
         } catch (LayerDataObjectToObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
@@ -94,13 +96,12 @@ public class sessionHandler extends WebServiceHandler {
         // Establishing Communication with remote layer for login
         //--------------------------------------------------------
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
-        UserInfo responseLogin = null;
+        Transactions responseTransactions = null;
         try {
-            if (operation) {
-                cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
-                responseLogin = Communication.postLoginData(communicationType, loginModel, cookie, cacheConnector);
+            if (!type) {
+                responseTransactions = Communication.getTransactionData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
             } else {
-                Communication.deleteLoginData(communicationType, loginModel, setCookie, cacheConnector);
+                Communication.getTransactionData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
             }
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);
@@ -118,16 +119,15 @@ public class sessionHandler extends WebServiceHandler {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         }
-        LayerDataObject responseLoginLDO = null;
-        if (operation) {
+        LayerDataObject responseTransactionLDO = null;
+        if (!type) {
             try {
-                responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
+                responseTransactionLDO = LayerDataObject.buildFromObject(responseTransactions);
+                response.addParamFromLDO(GenericParams.TRANSACTIONS_RESPONSE, responseTransactionLDO);
             } catch (LayerDataObjectParseException ex) {
                 logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
                 return WebServiceStatus.buildStatus(WebServiceStatusType.UNEXPECTED_ERROR);
             }
-            response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
-            response.addProperty(GenericParams.USER_COOKIE, cookie);
         }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }

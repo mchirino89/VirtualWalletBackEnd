@@ -67,9 +67,9 @@ public class Communication {
         return loginResult;
     }
     
-    public static void putLogoutData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+    public static void deleteLoginData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
-        new LogoutPUTCommunication(cacheConnector,cookie).communicate(ct, loginInputLDO);
+        new LogoutDELETECommunication(cacheConnector,cookie).communicate(ct, loginInputLDO);
     }
     
     public static UserInfo postRegistrationData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
@@ -96,7 +96,7 @@ public class Communication {
         deleteInstrumentCommunication.communicate(ct,loginInputLDO);
     }
     
-    public static Transactions getInstrumentData(DataLayerCommunicationType ct, InstrumentParamsModel instrumentModel, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+    public static Transactions getTransactionData(DataLayerCommunicationType ct, InstrumentParamsModel instrumentModel, String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(instrumentModel);
         InstrumentGETCommunication getInstrumentCommunication = new InstrumentGETCommunication(ci,instrumentId,cookie,cacheConnector);
         LayerDataObject response = getInstrumentCommunication.communicate(ct, loginInputLDO);   
