@@ -14,7 +14,9 @@ public class GenericParams {
     public static final String USER_COOKIE = "cookie";
     public static final String INSTRUMENTS_ALIAS = "aliasList";
     public static final String CARD_RESPONSE = "card";
+    public static final String ESTABLISHMENT_ID = "rif";
     public static final String TRANSACTIONS_RESPONSE = "transactions";
+    public static final String CHARGE = "Consumo en ";
     public static final String USER = "user-";
     public static final String INSTRUMENTS = "instruments-";
     public static final String TRANSACTIONS = "transactions-";
@@ -29,4 +31,5 @@ public class GenericParams {
     public static final int RANDOM_CARD_ID = 8;
     public static final String ACTIVICE_CARD = "1";
     public static final String DISABLE_CARD = "0";
+    
 }

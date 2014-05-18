@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.couchbase.client.CouchbaseClient;
@@ -10,8 +5,9 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
@@ -29,15 +25,13 @@ public class TestClass {
     private static final String KEY = "transactions-";
     private String cedulas[] = {"18839634", "19000000", "15000000"};
     private String prov[] = {"Master Card", "American Express", "Visa", "Maestro", "Dinner Club"};
-    private String id[] = {"n7lhs4qy", "aiskc3zl",      "7p4o7d10"      , "6g2k9xlm", "9h7zshs5",       "shn58544"      };
+    private String id[] = {"n7lhs4qy", "aiskc3zl", "7p4o7d10", "6g2k9xlm", "9h7zshs5", "shn58544"};
     private String ref[] = {"m0ai9s5c3kdzsxp0ns9mz4ea4ruelh", "6prwg5gm41yex13mg4tl5voy5w71bc", "3aypulbu4k3kasekfqnaow8hsga34m", "m7ul28k3uhrig2lkkvnnj4voxmbgst", "4yxgpbolje8jpv3dtbp6rert9xkgm5", "ok55nk0w5n0oa366vg33pzdfb95kuf"};
-    private float amounts[] = {62800,765,2260,11280,480,3500,260000};
-    private String descriptions[] = {"PS4 todo video. CC san ignacio","medicamentos farmatodo. la urbuna","consumo restaurante cinex el hatillo","respuestos. agencia chevrolet","panaderia las delicias. cc las americas","entradas VIP teatrex","boletos aeros ccs-madrid"};
-    
+    private float amounts[] = {62800, 765, 2260, 11280, 480, 3500, 260000};
+    private String descriptions[] = {"PS4 todo video. CC san ignacio", "medicamentos farmatodo. la urbuna", "consumo restaurante cinex el hatillo", "respuestos. agencia chevrolet", "panaderia las delicias. cc las americas", "entradas VIP teatrex", "boletos aeros ccs-madrid"};
     private Random aleatorio;
 
     public TestClass() {
-        
     }
 
     public TestClass(boolean sobrecargado) {
@@ -118,7 +112,7 @@ public class TestClass {
                     movimientos.add(new Transaction(generateDate(), descriptions[index], String.format("%.2f", amounts[index])));
                 }
                 //client.set(KEY + id[5], EXP_TIME, new Transactions(movimientos));
-                System.out.println(KEY + id[0]+": "+client.get(KEY + id[0]));
+                System.out.println(KEY + id[0] + ": " + client.get(KEY + id[0]));
                 break;
         }
     }
@@ -163,7 +157,7 @@ public class TestClass {
     }
 
     public static void main(String[] args) {
-        new TestClass();
+        new TestClass(true);
 
     }
 }

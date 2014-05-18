@@ -9,7 +9,7 @@ import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.utils.CookieUtils;
-import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
+import com.synergygb.billeteravirtual.notificacion.communication.utils.LoginCommunication;
 import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
@@ -98,9 +98,9 @@ public class sessionHandler extends WebServiceHandler {
         try {
             if (operation) {
                 cookie = CookieUtils.calculateCookieId(String.valueOf(loginModel.getCi()));
-                responseLogin = Communication.postLoginData(communicationType, loginModel, cookie, cacheConnector);
+                responseLogin = LoginCommunication.postLoginData(communicationType, loginModel, cookie, cacheConnector);
             } else {
-                Communication.deleteLoginData(communicationType, loginModel, setCookie, cacheConnector);
+                LoginCommunication.deleteLoginData(communicationType, loginModel, setCookie, cacheConnector);
             }
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);

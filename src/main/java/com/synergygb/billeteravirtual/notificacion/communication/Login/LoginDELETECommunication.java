@@ -16,15 +16,11 @@
  * http://www.synergy-gb.com/licenciamiento.pdf
  *
  */
-package com.synergygb.billeteravirtual.notificacion.communication;
+package com.synergygb.billeteravirtual.notificacion.communication.Login;
 
-import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
-import com.synergygb.billeteravirtual.notificacion.communication.exceptions.PreexistingUserException;
-import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunication;
@@ -35,8 +31,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
-import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
-import java.util.logging.Level;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -49,15 +43,17 @@ import java.util.logging.Level;
  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  * @version 1.0
  */
-public class RegistrationPOSTCommunication extends DataLayerCommunication {
+public class LoginDELETECommunication extends DataLayerCommunication {
 
-    private static final Logger logger = Logger.getLogger(RegistrationPOSTCommunication.class);
+    private static final Logger logger = Logger.getLogger(LoginDELETECommunication.class);
     private GenericMemcachedConnector cacheConnector;
-    WSLog wsLog = new WSLog("Communcation Login");
+    private String cookie;
+    WSLog wsLog = new WSLog("Communication LoginDELETECommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
-    public RegistrationPOSTCommunication(GenericMemcachedConnector cacheConnector) {
+    public LoginDELETECommunication(GenericMemcachedConnector cacheConnector,String cookie) {
         this.cacheConnector = cacheConnector;
+        this.cookie = cookie;
         logger.addAppender(conappender);
     }
 
@@ -66,22 +62,11 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
         //------------------------------------------------------------------
         // Declaring parsing variables
         //------------------------------------------------------------------
-        LoginParamsModel loginModel = null;
         LayerDataObject ldoResponse;
-        UserInfo info = null;
-        //---------------------------------------------------------------------
-        // Parsing the request parameters.
-        //---------------------------------------------------------------------
-        try {
-            loginModel = (LoginParamsModel) ldo.toObject(LoginParamsModel.class);
-        } catch (LayerDataObjectToObjectParseException ex) {
-            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo de los parametros ", ex);
-            throw new LayerCommunicationException();
-        }
         //Parsing response
-        info = initLoginInfo(loginModel);
+        deleteCookie();
         try {
-            ldoResponse = LayerDataObject.buildFromObject(info);
+            ldoResponse = LayerDataObject.buildFromObject("");
         } catch (LayerDataObjectParseException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error obteniendo el LDO "), ex);
             throw new LayerCommunicationException();
@@ -90,22 +75,11 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
     }
 
     //------ Respuesta ---------
-    private UserInfo initLoginInfo(LoginParamsModel loginModel) throws PreexistingUserException {
-        UserInfo info = new UserInfo();
+    private void deleteCookie() {
         try {
-            User respuesta = (User) cacheConnector.get(GenericParams.USER, loginModel.getCi());
-            if (respuesta == null) {
-                cacheConnector.save(GenericParams.USER, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginModel.getPass())), loginModel.getCi());
-            }
-            else{
-                throw new PreexistingUserException();
-            }
+            cacheConnector.remove(GenericParams.SESSION, this.cookie);
         } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + loginModel.getCi()));
-        } 
-        //Parsing userInfo
-        info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
-        //returning response
-        return info;
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se cerrar la sesion del usuario con la cookie: " + this.cookie));
+        }
     }
 }

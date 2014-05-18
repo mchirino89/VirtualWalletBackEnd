@@ -16,7 +16,7 @@
  * http://www.synergy-gb.com/licenciamiento.pdf
  *
  */
-package com.synergygb.billeteravirtual.notificacion.communication;
+package com.synergygb.billeteravirtual.notificacion.communication.Login;
 
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
@@ -59,7 +59,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     private GenericMemcachedConnector cacheConnector;
     private User respuesta;
     private String cookie;
-    WSLog wsLog = new WSLog("Communcation Login");
+    WSLog wsLog = new WSLog("Communication LoginPOSTCommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
 
     public LoginPOSTCommunication(GenericMemcachedConnector cacheConnector,String cookie) {

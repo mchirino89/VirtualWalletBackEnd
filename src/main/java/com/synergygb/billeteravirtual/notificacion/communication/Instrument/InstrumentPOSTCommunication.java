@@ -16,7 +16,7 @@
  * http://www.synergy-gb.com/licenciamiento.pdf
  *
  */
-package com.synergygb.billeteravirtual.notificacion.communication;
+package com.synergygb.billeteravirtual.notificacion.communication.Instrument;
 
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
@@ -53,7 +53,7 @@ public class InstrumentPOSTCommunication extends DataLayerCommunication {
 
     private static final Logger logger = Logger.getLogger(InstrumentPOSTCommunication.class);
     private GenericMemcachedConnector cacheConnector;
-    WSLog wsLog = new WSLog("Communcation Login");
+    WSLog wsLog = new WSLog("Communication InstrumentPOSTCommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
     private String ci, CardRef;
 

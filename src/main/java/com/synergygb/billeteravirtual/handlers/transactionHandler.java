@@ -8,7 +8,6 @@ package com.synergygb.billeteravirtual.handlers;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
-import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
 import com.synergygb.billeteravirtual.core.connector.cache.models.CacheBucketType;
@@ -16,9 +15,9 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
-import com.synergygb.billeteravirtual.notificacion.models.Card;
+import com.synergygb.billeteravirtual.notificacion.communication.utils.TransactionCommunication;
 import com.synergygb.billeteravirtual.notificacion.models.Transactions;
-import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
+import com.synergygb.billeteravirtual.notificacion.services.models.TransactionParamsModel;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
@@ -66,7 +65,7 @@ public class transactionHandler extends WebServiceHandler {
         //-----------------------------------------------------
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType = null;
-        InstrumentParamsModel instrumentModel = null;
+        TransactionParamsModel transactionModel = null;
         //-----------------------------------------------------
         // Declaring connector 
         //-----------------------------------------------------
@@ -78,7 +77,7 @@ public class transactionHandler extends WebServiceHandler {
         LayerDataObject loginLdo = null;
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
-            instrumentModel = (InstrumentParamsModel) loginLdo.toObject(InstrumentParamsModel.class);
+            transactionModel = (TransactionParamsModel) loginLdo.toObject(TransactionParamsModel.class);
         } catch (LayerDataObjectToObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
@@ -99,9 +98,9 @@ public class transactionHandler extends WebServiceHandler {
         Transactions responseTransactions = null;
         try {
             if (!type) {
-                responseTransactions = Communication.getTransactionData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
+                responseTransactions = TransactionCommunication.getTransactionData(communicationType, transactionModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
             } else {
-                Communication.getTransactionData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
+                TransactionCommunication.postTransactionData(communicationType, transactionModel, cacheConnector);
             }
         } catch (AuthenticationException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LAYER_COMMUNICATION.getId(), "Contrasena invalida"), ex);

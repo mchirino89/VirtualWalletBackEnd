@@ -7,7 +7,6 @@ package com.synergygb.billeteravirtual.handlers;
 
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
-import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
 import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
@@ -16,8 +15,7 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
-import com.synergygb.billeteravirtual.notificacion.communication.RegistrationPOSTCommunication;
-import com.synergygb.billeteravirtual.notificacion.communication.exceptions.PreexistingUserException;
+import com.synergygb.billeteravirtual.notificacion.communication.utils.RegistrationCommunication;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
@@ -32,7 +30,6 @@ import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationExce
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
 import com.synergygb.webAPI.parameters.WebServiceParameters;
-import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -88,9 +85,8 @@ public class registrationPOSTHandler extends WebServiceHandler {
         // Establishing Communication with remote layer for login
         //--------------------------------------------------------
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
-        UserInfo responseLogin = null;
         try {
-            responseLogin = Communication.postRegistrationData(communicationType, loginModel, cacheConnector);
+            RegistrationCommunication.postRegistrationData(communicationType, loginModel, cacheConnector);
         }  catch (BackendException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LAYER_COMMUNICATION.getId(), "Error de backend "), ex);
             return WebServiceStatus.buildStatus(new BackendErrorStatus(BackendErrorStatus.STATUS_CODE + "_" + ex.getMessage()));

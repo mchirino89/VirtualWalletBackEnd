@@ -1,7 +1,6 @@
 package com.synergygb.billeteravirtual.services;
 
 import com.synergygb.billeteravirtual.core.ServiceUtils;
-import com.synergygb.billeteravirtual.handlers.instrumentHandler;
 import com.synergygb.billeteravirtual.handlers.transactionHandler;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
@@ -12,7 +11,6 @@ import com.synergygb.webAPI.layerCommunication.WebServiceResponse;
 import com.synergygb.webAPI.parameters.ParametersMediaType;
 import com.synergygb.webAPI.parameters.exceptions.InvalidParametersFormatException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -51,7 +49,7 @@ public class TransactionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addInstrument(String content) {
+    public Response addTransaction(String content) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
@@ -71,7 +69,7 @@ public class TransactionResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{cookie}")
-    public Response checkInstrument(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
+    public Response checkTransactions(@PathParam("ci") String userId,@PathParam("id") String instrumentId,@PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty

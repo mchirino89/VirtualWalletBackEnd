@@ -8,7 +8,6 @@ package com.synergygb.billeteravirtual.handlers;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
-import com.synergygb.billeteravirtual.notificacion.communication.utils.Communication;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
 import com.synergygb.billeteravirtual.core.connector.cache.models.CacheBucketType;
@@ -16,8 +15,8 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
+import com.synergygb.billeteravirtual.notificacion.communication.utils.InstrumentCommunication;
 import com.synergygb.billeteravirtual.notificacion.models.Card;
-import com.synergygb.billeteravirtual.notificacion.models.Transactions;
 import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
@@ -100,10 +99,10 @@ public class instrumentHandler extends WebServiceHandler {
         try {
             switch (type) {
                 case GenericParams.INSTRUMENT_ADD: // Añadirlo
-                    responseCard = Communication.postInstrumentData(communicationType, instrumentModel, this.ci, cacheConnector);
+                    responseCard = InstrumentCommunication.postInstrumentData(communicationType, instrumentModel, this.ci, cacheConnector);
                     break;
                 case GenericParams.INSTRUMENT_REMOVE:// Eliminarlo
-                    Communication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
+                    InstrumentCommunication.deleteInstrumentData(communicationType, instrumentModel, this.ci, this.instrumentId, this.cookie, cacheConnector);
                     break;
             }
         } catch (AuthenticationException ex) {

@@ -87,5 +87,4 @@ public class InstrumentParamsModel implements Serializable {
         this.cookie = cookie;
     }
 
-    
 }

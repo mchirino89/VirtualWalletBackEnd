@@ -16,16 +16,14 @@
  * http://www.synergy-gb.com/licenciamiento.pdf
  *
  */
-package com.synergygb.billeteravirtual.notificacion.communication;
+package com.synergygb.billeteravirtual.notificacion.communication.Transactions;
 
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.AuthenticationException;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
-import com.synergygb.billeteravirtual.core.exceptions.NonExistingUser;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.services.models.InstrumentParamsModel;
-import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
+import com.synergygb.billeteravirtual.notificacion.services.models.TransactionParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunication;
@@ -37,10 +35,10 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Date;
 import java.util.logging.Level;
 
 /**
@@ -54,18 +52,14 @@ import java.util.logging.Level;
  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  * @version 1.0
  */
-public class InstrumentGETCommunication extends DataLayerCommunication {
+public class TransactionsPOSTCommunication extends DataLayerCommunication {
 
-    private static final Logger logger = Logger.getLogger(InstrumentGETCommunication.class);
+    private static final Logger logger = Logger.getLogger(TransactionsPOSTCommunication.class);
     private GenericMemcachedConnector cacheConnector;
-    WSLog wsLog = new WSLog("Communcation Login");
+    WSLog wsLog = new WSLog("Communication TransactionsPOSTCommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private String instrumentId, cookie, ci;
 
-    public InstrumentGETCommunication(String ci, String instrumentId, String cookie, GenericMemcachedConnector cacheConnector) {
-        this.ci = ci;
-        this.instrumentId = instrumentId;
-        this.cookie = cookie;
+    public TransactionsPOSTCommunication(GenericMemcachedConnector cacheConnector) {
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -76,14 +70,20 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         // Declaring parsing variables
         //------------------------------------------------------------------
         LayerDataObject ldoResponse;
-        Transactions info = null;
-        if (!checkCookie()) {
-            throw new AuthenticationException("Sesion inválida. Por favor autentíquese e intente de nuevo");
-        }
-        //Parsing response
-        info = initAddInstInfo();
+        TransactionParamsModel transaction = null;
+
         try {
-            ldoResponse = LayerDataObject.buildFromObject(info);
+            transaction = (TransactionParamsModel) ldo.toObject(TransactionParamsModel.class);
+            if (!checkCookie(transaction)) {
+                throw new AuthenticationException("Sesion inválida. Por favor autentíquese e intente de nuevo");
+            }
+        } catch (LayerDataObjectToObjectParseException ex) {
+            java.util.logging.Logger.getLogger(TransactionsPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo de la transacción ", ex);
+            throw new LayerCommunicationException();
+        }
+        AddTransactionInfo(transaction);
+        try {
+            ldoResponse = LayerDataObject.buildFromObject("");
         } catch (LayerDataObjectParseException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error obteniendo el LDO "), ex);
             throw new LayerCommunicationException();
@@ -91,38 +91,41 @@ public class InstrumentGETCommunication extends DataLayerCommunication {
         return ldoResponse;
     }
 
-    private boolean checkCookie() {
+    //Verificando la validez de la cookie recibida
+    private boolean checkCookie(TransactionParamsModel transaction) {
         try {
-            Session auxiliar = (Session) cacheConnector.get(GenericParams.SESSION, this.cookie);
-            if (auxiliar.getCi().equals(this.ci)) {
+            Session auxiliar = (Session) cacheConnector.get(GenericParams.SESSION, transaction.getCookie());
+            if (auxiliar.getCi().equals(transaction.getCi())) {
                 return true;
             }
         } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo verificar la validez del instrumento: " + transaction.getCardId()));
         }
         return false;
     }
 
     //------ Respuesta ---------
-    private Transactions initAddInstInfo() {
-        Transactions info = null;
-        //Getting transactions' info
-        try {
-            info = (Transactions) cacheConnector.get(GenericParams.TRANSACTIONS, this.instrumentId);
-            if (info != null) {
-                int index = 0;
-                for (Transaction auxiliar : info.getTarjetas()) {
-                    info.getTarjetas().get(index).setAmount(NumberFormat.getCurrencyInstance().format(Double.parseDouble(auxiliar.getAmount().replace(",", "."))).replaceAll("F.", "F "));
-                    index++;
+    private void AddTransactionInfo(TransactionParamsModel transaction) throws AuthenticationException {
+        if (checkOTP(transaction.getOtp())) {
+            try {
+                Transactions history = (Transactions) cacheConnector.get(GenericParams.TRANSACTIONS, transaction.getCardId());
+                if (history == null) {
+                    history = new Transactions(new ArrayList<Transaction>());
                 }
+                String charge = NumberFormat.getCurrencyInstance().format(Double.parseDouble(transaction.getAmount().replace(",", "."))).replaceAll("F.", "F ");
+                history.getTarjetas().add(new Transaction(new SimpleDateFormat("dd-MM-yyyy").format(new Date()), GenericParams.CHARGE + transaction.getEstablishment() ,charge));
+                cacheConnector.save(GenericParams.TRANSACTIONS, history ,transaction.getCardId());
+            } catch (CouchbaseOperationException ex) {
+                logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + transaction.getCardId()));
             }
-            else{
-                System.out.println("sin transacciones");
-                info = new Transactions(new ArrayList<Transaction>());
-            }
-        } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
+        } else {
+            throw new AuthenticationException("Código OTP no válido.");
         }
-        return info;
+    }
+
+    //------ Autenticación de código OTP -------
+    private boolean checkOTP(String otp) {
+        //Aqui falta la validación del código con el método de Gemalto
+        return !otp.isEmpty() && otp.length() != 0;
     }
 }
