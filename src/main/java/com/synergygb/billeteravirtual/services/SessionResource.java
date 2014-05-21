@@ -80,7 +80,7 @@ public class SessionResource {
         WebServiceResponse webResponse = WebServiceResponse.buildDefault(mediaType);
         WebServiceRequest webRequest = null;
         try {
-            webRequest = WebServiceRequest.build(request, headers, content, mediaType);
+            webRequest = WebServiceRequest.build(request, headers, "{}", mediaType);
         } catch (InvalidParametersFormatException ex) {
             ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
             return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), mediaType);

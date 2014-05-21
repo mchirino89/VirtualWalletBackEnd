@@ -87,12 +87,15 @@ public class TransactionsGETCommunication extends DataLayerCommunication {
     private boolean checkCookie() {
         try {
             Session auxiliar = (Session) cacheConnector.get(GenericParams.SESSION, this.cookie);
-            if (auxiliar.getCi().equals(this.ci)) {
-                return true;
+            if (auxiliar != null) {
+                return auxiliar.getCi().equals(this.ci);
+            }
+            else{
+                return false;
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los movimientos de la tarjeta : " + this.instrumentId));
-        }
+        } 
         return false;
     }
 

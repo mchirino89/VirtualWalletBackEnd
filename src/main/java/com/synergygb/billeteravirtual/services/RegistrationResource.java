@@ -49,6 +49,7 @@ public class RegistrationResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    
     public Response activateUser(String content) {
         WebServiceStatus status = null;
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
@@ -67,15 +68,14 @@ public class RegistrationResource {
         //---------------------------------------------------------------------
         // Calling login handler
         //---------------------------------------------------------------------
-        return getResponse(webResponse, webRequest, status, new registrationHandler(""));
+        return getResponse(webResponse, webRequest, status, new registrationHandler("",""));
     }
     
-    @DELETE
+    @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{ci}")
-    public Response desactivateUser(String content, @PathParam("ci") String userId) {
+    @Path("/{ci}/{cookie}")
+    public Response desactivateUser(String content, @PathParam("ci") String userId, @PathParam("cookie") String cookie) {
         WebServiceStatus status = null;
-        System.out.println("pasando por aqui");
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
         //---------------------------------------------------------------------
         // Building a WebServiceRequest from the service request and an empty
@@ -92,7 +92,7 @@ public class RegistrationResource {
         //---------------------------------------------------------------------
         // Calling login handler
         //---------------------------------------------------------------------
-        return getResponse(webResponse, webRequest, status, new registrationHandler(userId));
+        return getResponse(webResponse, webRequest, status, new registrationHandler(userId, cookie));
     }
 
     private Response getResponse(WebServiceResponse webResponse,WebServiceRequest webRequest, WebServiceStatus status, WebServiceHandler handler){

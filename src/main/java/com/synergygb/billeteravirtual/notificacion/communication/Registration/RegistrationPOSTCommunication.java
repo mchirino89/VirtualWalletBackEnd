@@ -97,11 +97,11 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
         try {
             User respuesta = (User) cacheConnector.get(GenericParams.USER, registrationModel.getCi());
             if (respuesta == null) {
-                activateUser(registrationModel);
+                activaUser(registrationModel);
             } else {
                 Wallet active = (Wallet) cacheConnector.get(GenericParams.WALLET, registrationModel.getCi());
                 if (active.getFlag().equals("0")) {
-                    activateUser(registrationModel);
+                    activaUser(registrationModel);
                 } else {
                     throw new PreexistingUserException("No puedes sobreescribir un usuario");
                 }
@@ -116,8 +116,8 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
         return info;
     }
     
-    private void activateUser(RegistrationParamsModel registrationModel) throws CouchbaseOperationException{
-        cacheConnector.save(GenericParams.USER, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(registrationModel.getPass())), registrationModel.getCi());
+    private void activaUser(RegistrationParamsModel registrationModel) throws CouchbaseOperationException{
+        cacheConnector.save(GenericParams.USER, new User(registrationModel.getPass()), registrationModel.getCi());
         cacheConnector.save(GenericParams.WALLET, new Wallet(), registrationModel.getCi());
     }
 }

@@ -26,7 +26,6 @@ import com.synergygb.billeteravirtual.core.exceptions.NonExistingUser;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.communication.exceptions.DisableWalletException;
 import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.models.cache.UserSession;
 import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
@@ -69,7 +68,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     }
 
     @Override
-    public LayerDataObject callRemoteLayer(LayerDataObject ldo) throws LayerCommunicationException {
+    public LayerDataObject callRemoteLayer(LayerDataObject ldo) throws AuthenticationException, NonExistingUser, LayerCommunicationException  {
         //------------------------------------------------------------------
         // Declaring parsing variables
         //------------------------------------------------------------------
@@ -102,7 +101,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     }
 
     //------ Pregunta ----------
-    private void initInput(LoginParamsModel loginModel) throws NonExistingUser {
+    private void initInput(LoginParamsModel loginModel) throws NonExistingUser, AuthenticationException, DisableWalletException {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi()));
         try {
             respuesta = (User) cacheConnector.get(GenericParams.USER, loginModel.getCi());
@@ -110,7 +109,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
                 throw new NonExistingUser("Usuario no registrado");
             } else {
                 if (!respuesta.getPass().equals(loginModel.getPass())) {
-                    throw new AuthenticationException("Password erroneo");
+                    throw new AuthenticationException();
                 }
                 Wallet userWallet = (Wallet)cacheConnector.get(GenericParams.WALLET, loginModel.getCi());
                 if (!userWallet.getFlag().equals("1")) {
@@ -119,14 +118,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario " + loginModel.getCi()));
-        } catch (AuthenticationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Clave incorrecta para el usuario " + loginModel.getCi()));
-            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, null, "Clave incorrecta");
         } 
-        catch (DisableWalletException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Billetera no activa para el usuario " + loginModel.getCi()));
-            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, null, "Billetera no activa");
-        }
     }
 
     //------ Respuesta ---------

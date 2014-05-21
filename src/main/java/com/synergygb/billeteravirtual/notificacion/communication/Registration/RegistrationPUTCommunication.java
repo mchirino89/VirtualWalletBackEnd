@@ -51,10 +51,11 @@ public class RegistrationPUTCommunication extends DataLayerCommunication {
     private GenericMemcachedConnector cacheConnector;
     WSLog wsLog = new WSLog("Communication RegistrationPOSTCommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private String ci;
+    private String ci, cookie;
 
-    public RegistrationPUTCommunication(GenericMemcachedConnector cacheConnector, String ci) {
+    public RegistrationPUTCommunication(String ci, String cookie,GenericMemcachedConnector cacheConnector) {
         this.ci = ci;
+        this.cookie = cookie;
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -77,11 +78,12 @@ public class RegistrationPUTCommunication extends DataLayerCommunication {
     }
 
     //------ Respuesta ---------
-    private void disableWallet() throws PreexistingUserException {
+    private void disableWallet() {
         try {
-            Wallet respuesta = (Wallet) cacheConnector.get(GenericParams.USER, this.ci);
+            Wallet respuesta = (Wallet) cacheConnector.get(GenericParams.WALLET, this.ci);
             respuesta.setFlag("0");
             cacheConnector.save(GenericParams.WALLET, respuesta, this.ci);
+            cacheConnector.remove(GenericParams.SESSION, cookie);
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo desactivar la billetera del usuario: " + this.ci));
         } 

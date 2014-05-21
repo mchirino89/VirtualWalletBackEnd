@@ -47,10 +47,11 @@ public class registrationHandler extends WebServiceHandler {
     private static final Logger logger = Logger.getLogger(registrationHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
-    private String ci;
+    private String ci, cookie;
 
-    public registrationHandler(String ci) {
+    public registrationHandler(String ci, String cookie) {
         this.ci = ci;
+        this.cookie = cookie;
         logger.addAppender(conappender);
     }
 
@@ -93,12 +94,10 @@ public class registrationHandler extends WebServiceHandler {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
         UserInfo responseLogin = null;
         try {
-            if (this.ci.endsWith("")) {
-                System.out.println("entrando aqui");
+            if (this.ci.equals("")) {
                 responseLogin = RegistrationCommunication.postRegistrationData(communicationType, registerModel, cacheConnector);
             } else {
-                System.out.println("desactivando billetera");
-                RegistrationCommunication.putRegistrationData(communicationType, registerModel, cacheConnector);
+                RegistrationCommunication.putRegistrationData(communicationType, ci, cookie, cacheConnector);
             }
         } catch (BackendException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LAYER_COMMUNICATION.getId(), "Error de backend "), ex);

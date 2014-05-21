@@ -19,6 +19,7 @@
 package com.synergygb.billeteravirtual.notificacion.communication.utils;
 
 import com.synergygb.billeteravirtual.notificacion.communication.Registration.RegistrationPOSTCommunication;
+import com.synergygb.billeteravirtual.notificacion.communication.Registration.RegistrationPUTCommunication;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.services.models.*;
@@ -42,8 +43,8 @@ public class RegistrationCommunication extends Communication{
         
     }
 
-    public static UserInfo postRegistrationData(DataLayerCommunicationType ct, RegisterParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
-        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
+    public static UserInfo postRegistrationData(DataLayerCommunicationType ct, RegisterParamsModel RegisterInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(RegisterInputParams);
         RegistrationPOSTCommunication postRegistrationCommunication = new RegistrationPOSTCommunication(cacheConnector);
         UserInfo loginResult;
         LayerDataObject response = postRegistrationCommunication.communicate(ct, loginInputLDO);
@@ -51,8 +52,8 @@ public class RegistrationCommunication extends Communication{
         return loginResult;
     }
     
-    public static void putRegistrationData(DataLayerCommunicationType ct, RegisterParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
-        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
-        new RegistrationPOSTCommunication(cacheConnector).communicate(ct, loginInputLDO);
+    public static void putRegistrationData(DataLayerCommunicationType ct, String ci,String cookie, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject("");
+        new RegistrationPUTCommunication(ci, cookie,cacheConnector).communicate(ct, loginInputLDO);
     }
 }
