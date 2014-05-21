@@ -7,7 +7,6 @@ package com.synergygb.billeteravirtual.handlers;
 
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendErrorStatus;
 import com.synergygb.billeteravirtual.core.config.exceptions.BackendException;
-import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.CouchbasePool;
 import com.synergygb.billeteravirtual.core.connector.cache.models.CacheBucketType;
@@ -15,8 +14,12 @@ import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationExceptio
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.core.services.handler.utils.HandlerUtils;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
+import com.synergygb.billeteravirtual.core.exceptions.EncryptionException;
+import com.synergygb.billeteravirtual.core.utils.CookieUtils;
 import com.synergygb.billeteravirtual.notificacion.communication.utils.RegistrationCommunication;
-import com.synergygb.billeteravirtual.notificacion.services.models.LoginParamsModel;
+import com.synergygb.billeteravirtual.notificacion.models.UserInfo;
+import com.synergygb.billeteravirtual.notificacion.services.models.RegisterParamsModel;
+import com.synergygb.billeteravirtual.params.GenericParams;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
@@ -30,6 +33,7 @@ import com.synergygb.webAPI.layerCommunication.exceptions.LayerCommunicationExce
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectParseException;
 import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
 import com.synergygb.webAPI.parameters.WebServiceParameters;
+import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -38,13 +42,15 @@ import org.apache.log4j.PatternLayout;
  *
  *  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  */
-public class registrationPOSTHandler extends WebServiceHandler {
+public class registrationHandler extends WebServiceHandler {
 
-    private static final Logger logger = Logger.getLogger(registrationPOSTHandler.class);
+    private static final Logger logger = Logger.getLogger(registrationHandler.class);
     WSLog wsLog = new WSLog("Handler servicio login");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
+    private String ci;
 
-    public registrationPOSTHandler() {
+    public registrationHandler(String ci) {
+        this.ci = ci;
         logger.addAppender(conappender);
     }
 
@@ -55,7 +61,7 @@ public class registrationPOSTHandler extends WebServiceHandler {
         //-----------------------------------------------------
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType;
-        LoginParamsModel loginModel = null;
+        RegisterParamsModel registerModel = null;
         //-----------------------------------------------------
         // Declaring connector 
         //-----------------------------------------------------
@@ -67,9 +73,9 @@ public class registrationPOSTHandler extends WebServiceHandler {
         LayerDataObject loginLdo = null;
         try {
             loginLdo = LayerDataObject.buildFromWSParams(params);
-            loginModel = (LoginParamsModel) loginLdo.toObject(LoginParamsModel.class);
+            registerModel = (RegisterParamsModel) loginLdo.toObject(RegisterParamsModel.class);
         } catch (LayerDataObjectToObjectParseException ex) {
-            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros de login " + loginLdo), ex);
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error en el parseo de los parametros del registrationPostHandler " + loginLdo), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.INVALID_PARAMETERS_CONTAINER_FORMAT);
         }
         //---------------------------------------------------------------------
@@ -85,9 +91,16 @@ public class registrationPOSTHandler extends WebServiceHandler {
         // Establishing Communication with remote layer for login
         //--------------------------------------------------------
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Iniciando comunicacion con la capa remota"));
+        UserInfo responseLogin = null;
         try {
-            RegistrationCommunication.postRegistrationData(communicationType, loginModel, cacheConnector);
-        }  catch (BackendException ex) {
+            if (this.ci.endsWith("")) {
+                System.out.println("entrando aqui");
+                responseLogin = RegistrationCommunication.postRegistrationData(communicationType, registerModel, cacheConnector);
+            } else {
+                System.out.println("desactivando billetera");
+                RegistrationCommunication.putRegistrationData(communicationType, registerModel, cacheConnector);
+            }
+        } catch (BackendException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LAYER_COMMUNICATION.getId(), "Error de backend "), ex);
             return WebServiceStatus.buildStatus(new BackendErrorStatus(BackendErrorStatus.STATUS_CODE + "_" + ex.getMessage()));
         } catch (LayerCommunicationException ex) {
@@ -96,10 +109,21 @@ public class registrationPOSTHandler extends WebServiceHandler {
         } catch (LayerDataObjectToObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
-        } 
-        catch (LayerDataObjectParseException ex) {
+        } catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
+        }
+        LayerDataObject responseLoginLDO = null;
+        if (this.ci.equals("")) {
+            try {
+                responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
+                response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
+                response.addProperty(GenericParams.USER_COOKIE, CookieUtils.calculateCookieId(String.valueOf(this.ci)));
+            } catch (EncryptionException ex) {
+                java.util.logging.Logger.getLogger(registrationHandler.class.getName()).log(Level.SEVERE, null, "Error de parseo en la respuesta de activacion");
+            } catch (LayerDataObjectParseException ex) {
+                java.util.logging.Logger.getLogger(registrationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return WebServiceStatus.buildStatus(WebServiceStatusType.OK);
     }

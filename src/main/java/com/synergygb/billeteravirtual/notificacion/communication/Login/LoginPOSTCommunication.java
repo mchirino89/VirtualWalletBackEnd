@@ -85,9 +85,7 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
             if(checkOTP(loginModel.getOtp())){
                 throw new AuthenticationException("Problemas con la OTP generada por este dispositivo");
             }
-            if (!initInput(loginModel)) {
-                throw new NonExistingUser("Usuario incorrecto");
-            }
+            initInput(loginModel);
         } catch (LayerDataObjectToObjectParseException ex) {
             java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo del login", ex);
             throw new LayerCommunicationException();
@@ -104,40 +102,31 @@ public class LoginPOSTCommunication extends DataLayerCommunication {
     }
 
     //------ Pregunta ----------
-    private boolean initInput(LoginParamsModel loginModel) {
+    private void initInput(LoginParamsModel loginModel) throws NonExistingUser {
         logger.info(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Consultando la existencia del usuario en la BD " + loginModel.getCi()));
         try {
             respuesta = (User) cacheConnector.get(GenericParams.USER, loginModel.getCi());
             if (respuesta == null) {
-                System.out.println("Usuario no registrado");
-                return false;
+                throw new NonExistingUser("Usuario no registrado");
             } else {
                 if (!respuesta.getPass().equals(loginModel.getPass())) {
-                    throw new AuthenticationException();
+                    throw new AuthenticationException("Password erroneo");
                 }
-                /*
                 Wallet userWallet = (Wallet)cacheConnector.get(GenericParams.WALLET, loginModel.getCi());
                 if (!userWallet.getFlag().equals("1")) {
-                    throw new DisableWalletException();
+                    throw new DisableWalletException("Billetera inactiva para este usuario");
                 }
-                        */
             }
         } catch (CouchbaseOperationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar el Login para el usuario " + loginModel.getCi()));
-            return false;
         } catch (AuthenticationException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Clave incorrecta para el usuario " + loginModel.getCi()));
             java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, null, "Clave incorrecta");
-            return false;
         } 
-        /*
         catch (DisableWalletException ex) {
             logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "Billetera no activa para el usuario " + loginModel.getCi()));
             java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, null, "Billetera no activa");
-            return false;
         }
-                */
-        return true;
     }
 
     //------ Respuesta ---------

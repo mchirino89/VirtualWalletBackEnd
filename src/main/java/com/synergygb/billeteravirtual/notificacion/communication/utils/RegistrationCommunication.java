@@ -42,12 +42,17 @@ public class RegistrationCommunication extends Communication{
         
     }
 
-    public static UserInfo postRegistrationData(DataLayerCommunicationType ct, LoginParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+    public static UserInfo postRegistrationData(DataLayerCommunicationType ct, RegisterParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
         LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
         RegistrationPOSTCommunication postRegistrationCommunication = new RegistrationPOSTCommunication(cacheConnector);
         UserInfo loginResult;
         LayerDataObject response = postRegistrationCommunication.communicate(ct, loginInputLDO);
         loginResult = (UserInfo) response.toObject(UserInfo.class);
         return loginResult;
+    }
+    
+    public static void putRegistrationData(DataLayerCommunicationType ct, RegisterParamsModel loginInputParams, GenericMemcachedConnector cacheConnector) throws LayerCommunicationException, LayerDataObjectToObjectParseException, LayerDataObjectParseException {
+        LayerDataObject loginInputLDO = LayerDataObject.buildFromObject(loginInputParams);
+        new RegistrationPOSTCommunication(cacheConnector).communicate(ct, loginInputLDO);
     }
 }

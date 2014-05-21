@@ -1,7 +1,7 @@
 package com.synergygb.billeteravirtual.services;
 
 import com.synergygb.billeteravirtual.core.ServiceUtils;
-import com.synergygb.billeteravirtual.handlers.registrationPOSTHandler;
+import com.synergygb.billeteravirtual.handlers.registrationHandler;
 import com.synergygb.webAPI.handlers.WebServiceHandler;
 import com.synergygb.webAPI.handlers.WebServiceStatus;
 import com.synergygb.webAPI.handlers.WebServiceStatusType;
@@ -10,8 +10,11 @@ import com.synergygb.webAPI.layerCommunication.WebServiceResponse;
 import com.synergygb.webAPI.parameters.ParametersMediaType;
 import com.synergygb.webAPI.parameters.exceptions.InvalidParametersFormatException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -46,7 +49,7 @@ public class RegistrationResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registrarUsuario(String content) {
+    public Response activateUser(String content) {
         WebServiceStatus status = null;
         ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
         //---------------------------------------------------------------------
@@ -55,7 +58,6 @@ public class RegistrationResource {
         //---------------------------------------------------------------------
         WebServiceResponse webResponse = WebServiceResponse.buildDefault(mediaType);
         WebServiceRequest webRequest = null;
-
         try {
             webRequest = WebServiceRequest.build(request, headers, content, mediaType);
         } catch (InvalidParametersFormatException ex) {
@@ -65,7 +67,35 @@ public class RegistrationResource {
         //---------------------------------------------------------------------
         // Calling login handler
         //---------------------------------------------------------------------
-        registrationPOSTHandler handler = new registrationPOSTHandler();
+        return getResponse(webResponse, webRequest, status, new registrationHandler(""));
+    }
+    
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{ci}")
+    public Response desactivateUser(String content, @PathParam("ci") String userId) {
+        WebServiceStatus status = null;
+        System.out.println("pasando por aqui");
+        ParametersMediaType mediaType = ParametersMediaType.APPLICATION_JSON;
+        //---------------------------------------------------------------------
+        // Building a WebServiceRequest from the service request and an empty
+        // response to be filled through the handler.
+        //---------------------------------------------------------------------
+        WebServiceResponse webResponse = WebServiceResponse.buildDefault(mediaType);
+        WebServiceRequest webRequest = null;
+        try {
+            webRequest = WebServiceRequest.build(request, headers, "{}", mediaType);
+        } catch (InvalidParametersFormatException ex) {
+            ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
+            return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), mediaType);
+        }
+        //---------------------------------------------------------------------
+        // Calling login handler
+        //---------------------------------------------------------------------
+        return getResponse(webResponse, webRequest, status, new registrationHandler(userId));
+    }
+
+    private Response getResponse(WebServiceResponse webResponse,WebServiceRequest webRequest, WebServiceStatus status, WebServiceHandler handler){
         try {
             status = handler.run(webRequest, webResponse);
         } catch (Exception e) {
@@ -81,24 +111,23 @@ public class RegistrationResource {
                 System.out.println("Linea: " + aux[i].getLineNumber());
                 separation(divisor);
             }
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
+            return WebServiceHandler.okResponseFromStatus(status, ParametersMediaType.APPLICATION_JSON);
         }
         //---------------------------------------------------------------------
         // Enconding response in UTF-8.
         //---------------------------------------------------------------------
-        webResponse.setUTF8Encoding(mediaType);
+        webResponse.setUTF8Encoding(ParametersMediaType.APPLICATION_JSON);
         //---------------------------------------------------------------------
         // Returning the appropriate response according to the status
         //---------------------------------------------------------------------
         if (status.ok()) {
-            WebServiceHandler.addStatusToWSResponse(webResponse, status, mediaType);
+            WebServiceHandler.addStatusToWSResponse(webResponse, status, ParametersMediaType.APPLICATION_JSON);
             return WebServiceHandler.okResponse(webResponse);
         } else {
-            return WebServiceHandler.okResponseFromStatus(status, mediaType);
+            return WebServiceHandler.okResponseFromStatus(status, ParametersMediaType.APPLICATION_JSON);
         }
-        //return Response.status(Response.Status.CREATED).build();
     }
-
+    
     private void separation(int limit) {
         for (int j = 0; j < limit; j++) {
             System.out.print("-");

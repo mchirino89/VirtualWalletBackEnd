@@ -102,13 +102,11 @@ public class TransactionsGETCommunication extends DataLayerCommunication {
         //Getting transactions' info
         try {
             info = (Transactions) cacheConnector.get(GenericParams.TRANSACTIONS, this.instrumentId);
-            if (info != null) {    
-                
+            if (info != null) {
                 for (int index = 0; index < info.getTarjetas().size(); index++) {
                     if(!info.getTarjetas().get(index).getAmount().contains("Bs.F "))
                         info.getTarjetas().get(index).setAmount(NumberFormat.getCurrencyInstance().format(Double.parseDouble(info.getTarjetas().get(index).getAmount().replace(",", "."))).replaceAll("F.", "F "));
                 }
-                       
             }
             else{
                 System.out.println("sin transacciones");

@@ -18,14 +18,11 @@
  */
 package com.synergygb.billeteravirtual.notificacion.communication.Registration;
 
-import com.synergygb.billeteravirtual.notificacion.communication.Login.LoginPOSTCommunication;
-import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
 import com.synergygb.billeteravirtual.notificacion.communication.exceptions.PreexistingUserException;
 import com.synergygb.billeteravirtual.notificacion.models.*;
-import com.synergygb.billeteravirtual.notificacion.services.models.RegistrationParamsModel;
 import com.synergygb.logformatter.WSLog;
 import com.synergygb.logformatter.WSLogOrigin;
 import com.synergygb.webAPI.layerCommunication.DataLayerCommunication;
@@ -36,9 +33,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.synergygb.billeteravirtual.params.GenericParams;
-import com.synergygb.webAPI.layerCommunication.exceptions.LayerDataObjectToObjectParseException;
-import java.util.ArrayList;
-import java.util.logging.Level;
 
 /**
  * Billetera Virtual+ REST Web Services
@@ -51,14 +45,16 @@ import java.util.logging.Level;
  * @author Mauricio Chirino <mauricio.chirino@synergy-gb.com>
  * @version 1.0
  */
-public class RegistrationPOSTCommunication extends DataLayerCommunication {
+public class RegistrationPUTCommunication extends DataLayerCommunication {
 
-    private static final Logger logger = Logger.getLogger(RegistrationPOSTCommunication.class);
+    private static final Logger logger = Logger.getLogger(RegistrationPUTCommunication.class);
     private GenericMemcachedConnector cacheConnector;
     WSLog wsLog = new WSLog("Communication RegistrationPOSTCommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
+    private String ci;
 
-    public RegistrationPOSTCommunication(GenericMemcachedConnector cacheConnector) {
+    public RegistrationPUTCommunication(GenericMemcachedConnector cacheConnector, String ci) {
+        this.ci = ci;
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -68,22 +64,11 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
         //------------------------------------------------------------------
         // Declaring parsing variables
         //------------------------------------------------------------------
-        RegistrationParamsModel loginModel = null;
         LayerDataObject ldoResponse;
-        UserInfo info = null;
         //---------------------------------------------------------------------
-        // Parsing the request parameters.
-        //---------------------------------------------------------------------
+        disableWallet();
         try {
-            loginModel = (RegistrationParamsModel) ldo.toObject(RegistrationParamsModel.class);
-        } catch (LayerDataObjectToObjectParseException ex) {
-            java.util.logging.Logger.getLogger(LoginPOSTCommunication.class.getName()).log(Level.SEVERE, "Ocurrio un problema con el parseo de los parametros ", ex);
-            throw new LayerCommunicationException();
-        }
-        //Parsing response
-        info = initLoginInfo(loginModel);
-        try {
-            ldoResponse = LayerDataObject.buildFromObject(info);
+            ldoResponse = LayerDataObject.buildFromObject("");
         } catch (LayerDataObjectParseException ex) {
             logger.debug(wsLog.setParams(WSLogOrigin.REMOTE_CLIENT, ErrorID.LDO_TO_OBJECT.getId(), "Ocurrio un error obteniendo el LDO "), ex);
             throw new LayerCommunicationException();
@@ -92,32 +77,13 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
     }
 
     //------ Respuesta ---------
-    private UserInfo initLoginInfo(RegistrationParamsModel registrationModel) throws PreexistingUserException {
-        UserInfo info = new UserInfo();
+    private void disableWallet() throws PreexistingUserException {
         try {
-            User respuesta = (User) cacheConnector.get(GenericParams.USER, registrationModel.getCi());
-            if (respuesta == null) {
-                activateUser(registrationModel);
-            } else {
-                Wallet active = (Wallet) cacheConnector.get(GenericParams.WALLET, registrationModel.getCi());
-                if (active.getFlag().equals("0")) {
-                    activateUser(registrationModel);
-                } else {
-                    throw new PreexistingUserException("No puedes sobreescribir un usuario");
-                }
-            }
+            Wallet respuesta = (Wallet) cacheConnector.get(GenericParams.USER, this.ci);
+            respuesta.setFlag("0");
+            cacheConnector.save(GenericParams.WALLET, respuesta, this.ci);
         } catch (CouchbaseOperationException ex) {
-            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo consultar los instrumentos para el usuario: " + registrationModel.getCi()));
-        }
-        //Parsing userInfo
-        info.setStime(String.valueOf(AppXMLConfiguration.MODULE_COUCHBASE_SESSION_TIMEOUT));
-        info.setInstrumentos(new ArrayList<Card>());
-        //returning response
-        return info;
-    }
-    
-    private void activateUser(RegistrationParamsModel registrationModel) throws CouchbaseOperationException{
-        cacheConnector.save(GenericParams.USER, new User(org.apache.commons.codec.digest.DigestUtils.sha256Hex(registrationModel.getPass())), registrationModel.getCi());
-        cacheConnector.save(GenericParams.WALLET, new Wallet(), registrationModel.getCi());
+            logger.warn(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.NO_ERROR.getId(), "No se pudo desactivar la billetera del usuario: " + this.ci));
+        } 
     }
 }

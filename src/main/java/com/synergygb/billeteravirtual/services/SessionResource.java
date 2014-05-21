@@ -10,6 +10,7 @@ import com.synergygb.webAPI.layerCommunication.WebServiceResponse;
 import com.synergygb.webAPI.parameters.ParametersMediaType;
 import com.synergygb.webAPI.parameters.exceptions.InvalidParametersFormatException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -66,7 +67,7 @@ public class SessionResource {
         return getResponse(webResponse, webRequest, status, new sessionHandler(null,true));
     }
     
-    @PUT
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{cookie}")
     public Response logoutUser(String content,@PathParam("cookie") String cookie) {

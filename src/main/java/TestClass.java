@@ -23,7 +23,7 @@ public class TestClass {
 
     private static final int EXP_TIME = 0;
     private static final String KEY = "transactions-";
-    private String cedulas[] = {"18839634", "19000000", "15000000"};
+    private String cedulas[] = {"18839634", "19000000", "15000000", "12000000"};
     private String prov[] = {"Master Card", "American Express", "Visa", "Maestro", "Dinner Club"};
     private String id[] = {"n7lhs4qy", "aiskc3zl", "7p4o7d10", "6g2k9xlm", "9h7zshs5", "shn58544"};
     private String ref[] = {"m0ai9s5c3kdzsxp0ns9mz4ea4ruelh", "6prwg5gm41yex13mg4tl5voy5w71bc", "3aypulbu4k3kasekfqnaow8hsga34m", "m7ul28k3uhrig2lkkvnnj4voxmbgst", "4yxgpbolje8jpv3dtbp6rert9xkgm5", "ok55nk0w5n0oa366vg33pzdfb95kuf"};
@@ -48,7 +48,7 @@ public class TestClass {
             client = new CouchbaseClient(serverList, "billetera", "");
             //------- Llenando la bd -----
             //borradoInstrumentos(client);
-            llenado(client, 4);
+            llenado(client, 5);
             //------- listar bd -----------
             //listado(client, 3);
             //------- Creacion de vistas -------
@@ -75,6 +75,7 @@ public class TestClass {
     }
 
     private void llenado(CouchbaseClient client, int type) {
+        int i, k;
         switch (type) {
             case 1://usuarios
                 for (String cedula : cedulas) {
@@ -83,23 +84,14 @@ public class TestClass {
                 }
                 break;
             case 2://instrumentos
-                /*
-                 int k = 0;
-                 for (String cedula : cedulas) {
-                 ArrayList<Instrument> tarj = new ArrayList<Instrument>();
-                 for (int i = 0; i < 3; i++, k++) {
-                 tarj.add(new Instrument(id[k], ref[k]));
-                 }
-                 client.set(KEY + cedula, EXP_TIME, new Instruments(tarj));
-                 }*/
                 ArrayList<Instrument> tarj = new ArrayList<Instrument>();
-                for (int i = 0, k = 6; i < 3; i++, k++) {
+                for (i = 0, k = 6; i < 3; i++, k++) {
                     tarj.add(new Instrument(id[k], ref[k]));
                 }
                 client.set("instruments-15000000", EXP_TIME, new Instruments(tarj));
                 break;
             case 3://ref
-                int i = 0;
+                i= 0;
                 for (String apuntador : this.ref) {
                     client.set(KEY + apuntador, EXP_TIME, new Card(String.valueOf(5000 + aleatorio.nextInt(5000)), prov[aleatorio.nextInt(prov.length)], id[i], "1"));
                     i++;
@@ -113,6 +105,11 @@ public class TestClass {
                 }
                 //client.set(KEY + id[5], EXP_TIME, new Transactions(movimientos));
                 System.out.println(KEY + id[0] + ": " + client.get(KEY + id[0]));
+                break;
+            case 5:
+                for(i = 0; i < cedulas.length; i++){
+                    System.out.println("Insercion de cédula correctamente: "+client.set("Wallet-"+cedulas[i], EXP_TIME, new Wallet("1")));
+                }
                 break;
         }
     }
