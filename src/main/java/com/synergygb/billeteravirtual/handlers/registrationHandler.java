@@ -63,6 +63,7 @@ public class registrationHandler extends WebServiceHandler {
         WebServiceParameters params = request.getRequestBody();
         DataLayerCommunicationType communicationType;
         RegisterParamsModel registerModel = null;
+        String cookie = null;
         //-----------------------------------------------------
         // Declaring connector 
         //-----------------------------------------------------
@@ -95,7 +96,8 @@ public class registrationHandler extends WebServiceHandler {
         UserInfo responseLogin = null;
         try {
             if (this.ci.equals("")) {
-                responseLogin = RegistrationCommunication.postRegistrationData(communicationType, registerModel, cacheConnector);
+                cookie = CookieUtils.calculateCookieId(String.valueOf(this.ci));
+                responseLogin = RegistrationCommunication.postRegistrationData(communicationType, registerModel, cookie, cacheConnector);
             } else {
                 RegistrationCommunication.putRegistrationData(communicationType, ci, cookie, cacheConnector);
             }
@@ -117,9 +119,7 @@ public class registrationHandler extends WebServiceHandler {
             try {
                 responseLoginLDO = LayerDataObject.buildFromObject(responseLogin);
                 response.addParamFromLDO(GenericParams.INSTRUMENTS_ALIAS, responseLoginLDO);
-                response.addProperty(GenericParams.USER_COOKIE, CookieUtils.calculateCookieId(String.valueOf(this.ci)));
-            } catch (EncryptionException ex) {
-                java.util.logging.Logger.getLogger(registrationHandler.class.getName()).log(Level.SEVERE, null, "Error de parseo en la respuesta de activacion");
+                response.addProperty(GenericParams.USER_COOKIE, cookie);
             } catch (LayerDataObjectParseException ex) {
                 java.util.logging.Logger.getLogger(registrationHandler.class.getName()).log(Level.SEVERE, null, ex);
             }

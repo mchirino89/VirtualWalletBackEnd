@@ -117,6 +117,9 @@ public class sessionHandler extends WebServiceHandler {
         } catch (LayerDataObjectParseException ex) {
             logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error de parseo. "), ex);
             return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
+        } catch (SecurityException ex) {
+            logger.error(wsLog.setParams(WSLogOrigin.INTERNAL_WS, ErrorID.LDO_TO_OBJECT.getId(), "Error con la cookie. "), ex);
+            return WebServiceStatus.buildStatus(WebServiceStatusType.LAYER_COMMUNICATION_ERROR);
         }
         LayerDataObject responseLoginLDO = null;
         if (operation) {

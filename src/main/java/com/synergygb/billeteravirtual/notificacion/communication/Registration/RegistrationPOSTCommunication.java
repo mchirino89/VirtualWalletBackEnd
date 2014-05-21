@@ -22,7 +22,9 @@ import com.synergygb.billeteravirtual.notificacion.communication.Login.LoginPOST
 import com.synergygb.billeteravirtual.core.config.AppXMLConfiguration;
 import com.synergygb.billeteravirtual.core.connector.cache.GenericMemcachedConnector;
 import com.synergygb.billeteravirtual.core.exceptions.CouchbaseOperationException;
+import com.synergygb.billeteravirtual.core.exceptions.EncryptionException;
 import com.synergygb.billeteravirtual.core.models.config.ErrorID;
+import com.synergygb.billeteravirtual.core.utils.CookieUtils;
 import com.synergygb.billeteravirtual.notificacion.communication.exceptions.PreexistingUserException;
 import com.synergygb.billeteravirtual.notificacion.models.*;
 import com.synergygb.billeteravirtual.notificacion.services.models.RegistrationParamsModel;
@@ -57,8 +59,10 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
     private GenericMemcachedConnector cacheConnector;
     WSLog wsLog = new WSLog("Communication RegistrationPOSTCommunication");
     static ConsoleAppender conappender = new ConsoleAppender(new PatternLayout());
+    String cookie;
 
-    public RegistrationPOSTCommunication(GenericMemcachedConnector cacheConnector) {
+    public RegistrationPOSTCommunication(String cookie, GenericMemcachedConnector cacheConnector) {
+        this.cookie = cookie;
         this.cacheConnector = cacheConnector;
         logger.addAppender(conappender);
     }
@@ -119,5 +123,6 @@ public class RegistrationPOSTCommunication extends DataLayerCommunication {
     private void activaUser(RegistrationParamsModel registrationModel) throws CouchbaseOperationException{
         cacheConnector.save(GenericParams.USER, new User(registrationModel.getPass()), registrationModel.getCi());
         cacheConnector.save(GenericParams.WALLET, new Wallet(), registrationModel.getCi());
+        cacheConnector.save(GenericParams.SESSION, new Session(registrationModel.getCi()), this.cookie);
     }
 }
