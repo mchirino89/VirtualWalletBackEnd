@@ -12,7 +12,6 @@ import com.synergygb.webAPI.parameters.exceptions.InvalidParametersFormatExcepti
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -61,7 +60,7 @@ public class SessionResource {
         try {
             webRequest = WebServiceRequest.build(request, headers, content, mediaType);
         } catch (InvalidParametersFormatException ex) {
-            ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);
+            ServiceUtils.addErrorStatus(WebServiceStatus.buildStatus(ex), webResponse);           
             return WebServiceHandler.okResponseFromStatus(WebServiceStatus.buildStatus(ex), mediaType);
         }
         return getResponse(webResponse, webRequest, status, new sessionHandler(null,true));
